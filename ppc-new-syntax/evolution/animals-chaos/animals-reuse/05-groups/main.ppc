@@ -1,0 +1,123 @@
+//==============================================================================
+// main.ppc - содержит главную функцию,
+// обеспечивающую простое тестирование
+//==============================================================================
+
+#include <stdio.h>
+#include "animals.pph"
+#include "swimming-dog.pph" // Добавим собаку-пловца
+#include "diving.pph"       // Добавление ныряльщика. Только пингвин
+#include "eating.pph"       // Добавление питания с использованием общей группы
+#include "groups.pph"       // Добавление определителя принадлежности к группе
+
+//------------------------------------------------------------------------------
+int main(int argc, char* argv[]) {
+  Elephant  e;
+  Dog       d;
+  Penguin   p;
+  Worm      w;
+
+  printf("==== Использование общей группы животных. Перемещение ====\n");
+
+  printf("--- Прямое использование специализаций ---\n");
+  AnyAnimal.elephant ae = {.elephant = &e};
+  AnyAnimal.dog      ad = {&d};
+  AnyAnimal.penguin  ap = {&p};
+  AnyAnimal.worm     aw = {{&w}};
+
+  Moving<(AnyAnimal*)&ae>();
+  Moving<(AnyAnimal*)&ad>();
+  Moving<(AnyAnimal*)&ap>();
+  Moving<(AnyAnimal*)&aw>();
+
+  printf("--- Использование специализаций через обобщенный указатель ---\n");
+  AnyAnimal* any;
+  any =  (AnyAnimal*)&ae;
+  Moving<any>();
+  any =  (AnyAnimal*)&ad;
+  Moving<any>();
+  any =  (AnyAnimal*)&ap;
+  Moving<any>();
+  any =  (AnyAnimal*)&aw;
+  Moving<any>();
+
+  printf("\n==== Использование группы пловцов ====\n");
+  printf("--- Прямое использование специализаций ---\n");
+  SwimmingAnimal.penguin  sp = {&p};
+  Swimming<&sp>();
+  SwimmingAnimal.dog  sd = {&d};
+  Swimming<&sd>();
+
+  printf("--- Использование специализаций через обобщенный указатель ---\n");
+  SwimmingAnimal* swimmer;
+  swimmer =  (SwimmingAnimal*)&sp;
+  Swimming<swimmer>();
+  swimmer =  (SwimmingAnimal*)&sd;
+  Swimming<swimmer>();
+
+  printf("\n==== Использование группы говорунов ====\n");
+  printf("--- Прямое использование специализаций ---\n");
+  SpeakingAnimal.elephant  spe = {&e};
+  Speaking<&spe>();
+  SpeakingAnimal.dog  spd = {&d};
+  Speaking<&spd>();
+  SpeakingAnimal.penguin  spp = {&p};
+  Speaking<&spp>();
+
+  printf("--- Использование специализаций через обобщенный указатель ---\n");
+  SpeakingAnimal* speaker;
+  speaker =  (SpeakingAnimal*)&spe;
+  Speaking<speaker>();
+  speaker =  (SpeakingAnimal*)&spd;
+  Speaking<speaker>();
+  speaker =  (SpeakingAnimal*)&spp;
+  Speaking<speaker>();
+
+  printf("\n==== Использование группы ныряльщиков ====\n");
+  printf("--- Прямое использование специализаций ---\n");
+  DivingAnimal.penguin  dp = {&p};
+  Diving<&dp>();
+
+  printf("--- Использование специализаций через обобщенный указатель ---\n");
+  DivingAnimal* diver;
+  diver =  (DivingAnimal*)&dp;
+  Diving<diver>();
+
+  printf("\n==== Использование общей группы животных. Питание ====\n");
+
+  printf("--- Прямое использование специализаций ---\n");
+  Eating<(AnyAnimal*)&ae>();
+  Eating<(AnyAnimal*)&ad>();
+  Eating<(AnyAnimal*)&ap>();
+  Eating<(AnyAnimal*)&aw>();
+
+  printf("--- Использование специализаций через обобщенный указатель ---\n");
+  any =  (AnyAnimal*)&ae;
+  Eating<any>();
+  any =  (AnyAnimal*)&ad;
+  Eating<any>();
+  any =  (AnyAnimal*)&ap;
+  Eating<any>();
+  any =  (AnyAnimal*)&aw;
+  Eating<any>();
+
+  printf("\n==== Определение принадлежности животных к конкретной группе ====\n");
+
+  printf("--- Прямое использование специализаций ---\n");
+  Group<(AnyAnimal*)&ae>();
+  Group<(AnyAnimal*)&ad>();
+  Group<(AnyAnimal*)&ap>();
+  Group<(AnyAnimal*)&aw>();
+
+  printf("--- Использование специализаций через обобщенный указатель ---\n");
+  any =  (AnyAnimal*)&ae;
+  Group<any>();
+  any =  (AnyAnimal*)&ad;
+  Group<any>();
+  any =  (AnyAnimal*)&ap;
+  Group<any>();
+  any =  (AnyAnimal*)&aw;
+  Group<any>();
+
+  return 0;
+}

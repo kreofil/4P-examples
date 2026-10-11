@@ -1,0 +1,73 @@
+// Компилировать: ppclang -xc visitor-multimethod.ppc -o visitor-multimethod
+#include <stdio.h>
+
+// Утка
+typedef struct Duck {} Duck;
+// Информация об утке
+char* AboutDuck(Duck* a) {
+  return "It is the Duck.";
+}
+
+// Собака
+typedef struct Dog {} Dog;
+// Информация об утке
+char* AboutDog(Dog* a) {
+  return "It is the Dog.";
+}
+
+// Обобщение для животных.
+typedef struct Animal {} case{} Animal;
+//  Специализации животных
+Animal + {Duck duck;};
+Animal + {Dog dog;};
+// Animal + {Duck duck; Dog dog;};
+// Обобщенная инициализация животных (пока пустая)
+void Init<Animal* a>() = 0;
+// Специализированные инициализаторы
+void Init<Animal.duck* a>() {
+  printf("Duck created!\n");
+}
+void Init<Animal.dog* a>() {
+  printf("Dog created!\n");
+}
+
+// Обобщенный посетитель
+typedef struct Visitor {} case{} Visitor;
+// Специализации посетителя
+Visitor + {void feed;};
+Visitor + {void swim;};
+
+// Обобщающие функции, реализованные с использованием мультиметода
+// Посещение животного и действие над ним
+void Visit<Animal* a, Visitor* v>() = 0;
+// Обработчики специализаций посетителя
+void Visit<Animal.duck* a, Visitor.feed* v>() {
+  printf("%s It eats grain\n", AboutDuck(&(a->duck)));
+}
+void Visit<Animal.duck* a, Visitor.swim* v>() {
+  printf("%s  It is very good swimmer.\n", AboutDuck(&(a->duck)));
+}
+void Visit<Animal.dog* a, Visitor.feed* v>() {
+  printf("%s It eats meat\n", AboutDog(&(a->dog)));
+}
+void Visit<Animal.dog* a, Visitor.swim* v>() {
+  printf("%s  It is not a good swimmer.\n", AboutDog(&(a->dog)));
+}
+
+// Клиентский код может выполнять операции посетителя над любым набором.
+void Client(Animal* animal, Visitor *visitor) {
+    Visit<animal, visitor>();
+}
+
+int main() {
+  struct Animal.duck duck; Init<(Animal*)&duck>();
+  struct Animal.dog dog;   Init<(Animal*)&dog>();
+  struct Visitor.feed feeding;
+  struct Visitor.swim swimming;
+  Client((Animal*)&duck, (Visitor*)&feeding);
+  Client((Animal*)&dog, (Visitor*)&feeding);
+  Client((Animal*)&duck, (Visitor*)&swimming);
+  Client((Animal*)&dog, (Visitor*)&swimming);
+
+  return 0;
+}

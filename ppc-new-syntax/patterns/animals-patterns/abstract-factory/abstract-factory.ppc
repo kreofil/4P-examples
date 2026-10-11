@@ -1,0 +1,127 @@
+// Компилировать: ppclang -xc abstract-factory.ppc -o abstract-factory
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+//------------------------------------------------------------------------------
+// Семейство домашних животных
+// Домашняя утка
+typedef struct DomesticDuck {} DomesticDuck;
+void DomesticDuckMessage() {printf("It is Domestic duck.\n");}
+// Домашняя собака
+typedef struct DomesticDog {} DomesticDog;
+void DomesticDogMessage() {printf("It is Domestic dog.\n");}
+
+//------------------------------------------------------------------------------
+// Семейство животных - игрушек
+// Игрушечная утка
+typedef struct ToyDuck {} ToyDuck;
+void ToyDuckMessage() {printf("It is Toy duck.\n");}
+// Игрушечная собака
+typedef struct ToyDog {} ToyDog;
+void ToyDogMessage() {printf("It is Toy dog.\n");}
+
+//------------------------------------------------------------------------------
+// Абстрактная утка, обобщающая разные семейства.
+typedef struct Duck {} case {} Duck;
+void DuckMessage() {printf("Duck created! ");}
+// Специализации уток
+// Duck + {DomesticDuck domesticDuck;};
+// Duck + {ToyDuck toyDuck;};
+struct Duck + {DomesticDuck domesticDuck; ToyDuck toyDuck;};
+
+// Абстрактная собака, обобщающая разные семейства
+typedef struct Dog {} case{} Dog;
+void DogMessage() {printf("Dog created! ");}
+// Специализации собак
+// Dog + {DomesticDog domesticDog;};
+// Dog + {ToyDog toyDog;};
+Dog + {DomesticDog domesticDog; ToyDog toyDog;};
+
+//------------------------------------------------------------------------------
+// Обобщенная Абстрактная фабрика.
+// Задается эволюционно расширяемым перечислимым типом.
+typedef struct AbstractFactory {} case{} AbstractFactory;
+AbstractFactory + {void ForDomestic;};
+AbstractFactory + {void ForToy;};
+
+//------------------------------------------------------------------------------
+// Обобщающая функция, определяющая интерфейс для создания одну из уток.
+Duck* CreateDuck<AbstractFactory* f>() = 0;
+// Duck* CreateDuck<AbstractFactory* f>() {
+//   printf("You need to define spec function\n");
+//   exit(33);
+// }
+//Обработчик, обеспечивающий создание домашней утки.
+Duck* CreateDuck<AbstractFactory.ForDomestic* f>() {
+  Duck.domesticDuck* d = create_spec(Duck.domesticDuck);
+  DuckMessage();
+  DomesticDuckMessage();
+  return (Duck*)d;
+}
+//Обработчик, обеспечивающий создание игрушечной утки.
+Duck* CreateDuck<AbstractFactory.ForToy* f>() {
+  Duck.toyDuck* d = create_spec(Duck.toyDuck);
+  DuckMessage();
+  ToyDuckMessage();
+  return (Duck*)d;
+}
+
+//------------------------------------------------------------------------------
+// Обобщающая функция, определяющая интерфейс для создания одной из собак.
+// Dog* CreateDog<AbstractFactory* f>() {return NULL;} //= 0;
+Dog* CreateDog<AbstractFactory* f>() = 0; //{exit(42);}
+//Обработчик, обеспечивающий создание домашней собаки.
+Dog* CreateDog<AbstractFactory.ForDomestic* f>() {
+  Dog.domesticDog* d = create_spec(Dog.domesticDog);
+  DogMessage();
+  DomesticDogMessage();
+  return (Dog*)d;
+}
+//Обработчик, обеспечивающий создание игрушечной собаки.
+Dog* CreateDog<AbstractFactory.ForToy* f>() {
+  Dog.toyDog* d = create_spec(Dog.toyDog);
+  DogMessage();
+  ToyDogMessage();
+  return (Dog*)d;
+}
+
+//------------------------------------------------------------------------------
+// Клиентский код работает с фабриками и животными только через абстрактные
+// типы: Это позволяет передавать любой тип фабрики или продукта
+// клиентскому коду, не нарушая его.
+void ClientCode(AbstractFactory *factory) {
+  const Duck *duck = CreateDuck<factory>();
+  const Dog *dog = CreateDog<factory>();
+  free((void*)duck);
+  free((void*)dog);
+}
+
+//------------------------------------------------------------------------------
+//  Тестирование фабрик и животных
+int main() {
+  printf("Step 1: Testing client code with the first factory type:\n");
+  AbstractFactory* f1 = create_spec(AbstractFactory.ForDomestic);
+  ClientCode(f1);
+  free(f1);
+
+  printf("\n");
+  printf
+      ("Step 2: Testing the same client code with the second factory type:\n");
+  AbstractFactory* f2 = create_spec(AbstractFactory.ForToy);
+  ClientCode(f2);
+  free(f2);
+
+  printf("\n");
+  printf("Step 3: Testing client code with the first factory type:\n");
+  AbstractFactory.ForDomestic f3;
+  ClientCode((AbstractFactory*)&f3);
+
+  printf("\n");
+  printf
+      ("Step 4: Testing the same client code with the second factory type:\n");
+  AbstractFactory.ForToy f4;
+  ClientCode((AbstractFactory*)&f4);
+
+  return 0;
+}

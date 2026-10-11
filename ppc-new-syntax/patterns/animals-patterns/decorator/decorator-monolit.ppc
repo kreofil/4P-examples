@@ -1,0 +1,107 @@
+// Компилировать: ppclang -xc decorator-monolit.ppc -o decorator-monolit
+#include <stdio.h>
+
+// Обобщенное животное
+typedef struct Animal {} case{} Animal;
+void GetInfo<Animal* a>() = 0;
+
+// Утка
+typedef struct Duck {} Duck;
+Animal + {Duck duck;};
+
+void GetInfo<Animal.duck* a>() {
+  printf("I am the Duck");
+};
+
+// Собака
+typedef struct Dog {} Dog;
+// Animal + <Dog;>;
+Animal + {Dog dog;};
+
+void GetInfo<Animal.dog* a>() {
+  printf("I am the Dog");
+};
+
+//------------------------------------------------------------------------------
+// Использование отдельных декораторов, непосредственно подключаемых к животным
+//------------------------------------------------------------------------------
+
+// Декоратор, добавляющий возраст
+// typedef struct AgeDecorator {int age;}< animal: Animal;> AgeDecorator;
+
+//!!! Не реализован вариант, когда специализации описываются в самом обобщении.!!!
+// typedef struct AgeDecorator {int age;} case{Animal animal;} AgeDecorator;
+
+typedef struct AgeDecorator {int age;} case{} AgeDecorator;
+AgeDecorator + {Animal animal;};
+
+void InitAgeDecorator(AgeDecorator* a, int age) {
+  a->age = age;
+}
+void GetAgeDecoratorInfo<AgeDecorator* d>() = 0;
+// AgeDecorator + <Animal;>;
+void GetAgeDecoratorInfo<AgeDecorator.animal* d>() {
+  // Перенаправление дальше на животного
+  GetInfo<&(d->animal)>();
+  printf(", I am %d yeas old.", d->age);
+}
+
+Animal + {AgeDecorator ageDecorator;};
+// Animal + {AgeDecorator ageDecorator;};
+void GetInfo<Animal.ageDecorator* a>() {
+  // Перенаправление дальше на животного
+  struct AgeDecorator.animal* d = (struct AgeDecorator.animal*)&(a->ageDecorator);
+  GetInfo<(Animal*)&(d->animal)>();
+  printf(", I am %d yeas old.", a->ageDecorator.age);
+}
+
+// Декоратор, добавляющий имя
+//!!! Не реализован вариант, когда специализации описываются в самом обобщении.!!!
+// typedef struct NameDecorator {char* name;} case{Animal animal;} NameDecorator;
+
+typedef struct NameDecorator {char* name;} case{} NameDecorator;
+NameDecorator + {Animal animal;};
+
+void InitNameDecorator(NameDecorator* a, char* name) {
+  a->name = name;
+}
+
+Animal + {NameDecorator nameDecorator;};
+void GetInfo<Animal.nameDecorator* a>() {
+  printf("My name is %s. ", a->nameDecorator.name);
+  // Перенаправление дальше на животного
+  struct NameDecorator.animal* d = (struct NameDecorator.animal*)&(a->nameDecorator);
+  GetInfo<(Animal*)&(d->animal)>();
+}
+
+// Клиент запускает сформированных животных
+void ClientCode(Animal* a) {
+  printf("\n");
+  GetInfo<a>();
+  printf("\n");
+}
+
+int main() {
+  printf("Different Animals:\n");
+  struct Animal.duck duck;
+  struct Animal.dog  dog;
+
+  ClientCode(&duck);
+  ClientCode(&dog);
+
+  Animal.ageDecorator.animal.duck duckAge;
+  InitAgeDecorator(&duckAge.ageDecorator, 2);
+  ClientCode(&duckAge);
+
+  Animal.nameDecorator.animal.ageDecorator.animal.dog dogNameAge;
+  InitNameDecorator(&dogNameAge.nameDecorator, "Rex");
+  InitAgeDecorator(&dogNameAge.nameDecorator.animal.ageDecorator, 10);
+  ClientCode(&dogNameAge);
+
+  Animal.ageDecorator.animal.nameDecorator.animal.dog otherDogAgeName;
+  InitAgeDecorator(&otherDogAgeName.ageDecorator, 5);
+  InitNameDecorator(&otherDogAgeName.ageDecorator.animal.nameDecorator, "Mu-mu");
+  ClientCode(&otherDogAgeName);
+
+  return 0;
+}

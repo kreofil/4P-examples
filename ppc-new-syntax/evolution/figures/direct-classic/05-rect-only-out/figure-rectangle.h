@@ -1,0 +1,17 @@
+#ifndef __figure_rectangle__
+#define __figure_rectangle__
+
+//==============================================================================
+// figure-rectangle.h - описание специализации фигуры как прямоугольника
+//==============================================================================
+
+#include "figure.h"
+#include "rectangle.h"
+
+//------------------------------------------------------------------------------
+// Фигура - прямоугольник
+// Figure + case { rect: Rectangle; };
+// Figure + { Rectangle rect; };
+struct Figure + { struct Rectangle rect; };
+
+#endif // __figure_rectangle__

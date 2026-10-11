@@ -1,0 +1,263 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+
+// Паттерн Наблюдатель
+
+// Назначение: Создаёт механизм подписки, позволяющий одним объектам следить и
+// реагировать на события, происходящие в других объектах.
+
+// Обратите внимание, что существует множество различных терминов с похожими
+// значениями, связанных с этим паттерном. Просто помните, что Субъекта также
+// называют Издателем, а Наблюдателя часто называют Подписчиком и наоборот.
+// Также глаголы «наблюдать», «слушать» или «отслеживать» обычно означают одно и
+// то же.
+
+//------------------------------------------------------------------------------
+// Общие понятия субъекта и наблюдателя
+//------------------------------------------------------------------------------
+typedef struct Observer Observer;
+
+// Список для наблюдателей. Создается как замена класса list
+// Элемент списка
+typedef struct ListElement {
+  Observer* observer;
+  struct ListElement* next;
+} ListElement;
+// Голова списка
+typedef struct List {
+  ListElement* first;
+  ListElement* last;
+} List;
+
+// Cубъект владеет сообщением и оповещает наблюдателей об его изменениях.
+typedef struct Subject {
+  List listObserver;
+  char message[256];
+} case{} Subject;
+
+// Наблюдатель может устанавливать связь с конкретным субъектом
+// для получения его текущего состояния
+typedef struct Observer {
+  Subject *subject;
+  char messageFromSubject[256];
+  int number;
+} case{} Observer;
+// Число созданных наблюдателей
+static int observerStaticNumber = 0;
+
+//------------------------------------------------------------------------------
+// Описание интерфейса для работы со списком, использующи абстрактного
+// наблюдателя
+//------------------------------------------------------------------------------
+
+// Начальная инициализация списка
+void ListInit(List* list) {
+  list->first = list->last = NULL;
+}
+// Добавление наблюдателя в конец списка
+void ListPushBack(List* list, Observer* observer) {
+  ListElement* element = malloc(sizeof(ListElement));
+  element->observer = observer;
+  element->next = NULL;
+  if(list->first == NULL) {
+    list->first = element;
+    list->last = element;
+  } else {
+    list->last->next = element;
+    list->last = element;
+  }
+}
+// Определение длины списка
+int ListSize(List* list) {
+  int count = 0;
+  ListElement* e = list->first;
+  while(e != NULL) {
+    ++count;
+    e = e->next;
+  }
+  return count;
+}
+
+// Поиск наблюдателя в списке по совпадению указателей
+// удалением элемента списка без удаления наблюдателя
+void ListRemove(List* list, Observer* observer) {
+  ListElement* e = list->first;
+  ListElement* pre = NULL;
+  while(e != NULL) {
+    if(e->observer->number == observer->number) {
+      if(e == list->first) { // первый в списке
+        // Если единственный в спискe
+        if(list->first == list->last) {
+          list->first = list->last = NULL;
+          free(e);
+          return;
+        }
+        list->first = e->next;
+        free(e);
+        return;
+      }
+      if(list->last == e) {
+        list->last = pre;
+      }
+      pre->next = e->next;
+      free(e);
+      return;
+    }
+    pre = e;
+    e = e->next;
+  }
+}
+
+// Отсоединение наблюдателя из списка по его числовому идентификатору
+void Detach(Subject* subject, Observer *observer) {
+  ListRemove(&(subject->listObserver), observer);
+}
+
+//------------------------------------------------------------------------------
+// Описание функций, определяющих работу субъекта
+//------------------------------------------------------------------------------
+
+// Удаление наблюдателя из динамической памяти, подключенного к указателю
+void SubjectDelete(Subject* subject) {
+  printf("Goodbye, I was the Subject.\n");
+  free(subject);
+}
+
+// Управление подпиской. Фунция общая для всех субъектов
+void Attach(Subject* subject, Observer *observer) {
+  ListPushBack(&(subject->listObserver), observer);
+}
+
+//  Информация о числе наблюдателей за субъектом
+void HowManyObserver(Subject* subject) {
+  printf("There are %d observers in the list.\n",
+         ListSize(&(subject->listObserver)));
+}
+
+void Update(Observer* observer, char* messageFromSubject);
+// Пересылка субъектом информации своим наблюдателям
+void Notify(Subject* subject) {
+  HowManyObserver(subject);
+  // Пересылка уведомлений по списку наблюдателей
+  ListElement* e = subject->listObserver.first;
+  while(e != NULL) {
+    Update(e->observer, subject->message);
+    e = e->next;
+  }
+}
+
+// Создание сообщения субъектом с последующим уведомлением наблюдателей
+void CreateMessage(Subject* subject, char* message) {
+  if(message == NULL) {strcpy(subject->message, "Empty");}
+  strcpy(subject->message, message);
+  Notify(subject);
+}
+
+// Обычно логика подписки – только часть того, что делает Издатель. Издатели
+// часто содержат некоторую важную бизнес-логику, которая запускает метод
+// уведомления всякий раз, когда должно произойти что-то важное (или после
+// этого).
+void SomeBusinessLogic(Subject* subject) {
+  strcpy(subject->message, "change message message");
+  Notify(subject);
+  printf("I'm about to do some thing important\n");
+}
+
+//------------------------------------------------------------------------------
+// Описание функций, определяющих работу наблюдателя
+//------------------------------------------------------------------------------
+
+// Инициализация наблюдателя
+void ObserverInit(Observer* observer, Subject *subject) {
+  observer->subject = subject;
+  Attach(subject, observer);
+  printf("Hi, I'm the Observer \"%d\".\n", ++observerStaticNumber);
+  observer->number = observerStaticNumber;
+}
+
+// Создание обобщенного наблюдателя в динамически выделяемой памяти
+Observer* ObserverCreate(Subject* subject) {
+  // Observer *observer = malloc(sizeof(Observer));
+  Observer *observer = create_spec(Observer);
+  ObserverInit(observer, subject);
+  return observer;
+}
+
+// Удаление наблюдателя через указатель
+void ObserverDelete(Observer* observer) {
+  printf("Goodbye, I was the Observer \"%d\".\n", observer->number);
+  free(observer);
+}
+
+// Вывод наблюдателями общей информации
+void PrintInfo(Observer* observer);
+void Update(Observer* observer, char* messageFromSubject) {
+  strcpy(observer->messageFromSubject, messageFromSubject);
+  PrintInfo(observer);
+}
+
+// Отсоединение наблюдателя от списка
+void Detach(Subject* subject, Observer *observer);
+void RemoveMeFromTheList(Observer* observer) {
+  Detach(observer->subject, observer);
+  printf("Observer \"%d\" removed from the list.\n", observer->number);
+}
+
+// Вывод наблюдателем общей информации о полученном сообщении
+void PrintInfo(Observer* observer) {
+  printf("Observer \"%d\": a new message is available --> %s\n",
+         observer->number, observer->messageFromSubject);
+}
+
+//------------------------------------------------------------------------------
+// Клиентский код, осуществляющий взаимодействие субъектов и наблюдателей
+//------------------------------------------------------------------------------
+
+// Новый наблюдатель, аналогичный обобщенному, но может расширять
+// функциональность, при добавлении обобщенных функций.
+// При их отсутствии пользуется обычными функциями обобщения
+Observer + {void x;};
+
+void ClientCode() {
+  // Subject *subject = malloc(sizeof(Subject));
+  Subject *subject = create_spec(Subject);
+  Observer *observer1 = ObserverCreate(subject);
+  Observer *observer2 = ObserverCreate(subject);
+  Observer *observer3 = ObserverCreate(subject);
+  Observer *observer4;
+  Observer *observer5;
+
+  CreateMessage(subject, "Hello World! :D");
+  RemoveMeFromTheList(observer3);
+
+  CreateMessage(subject, "The weather is hot today! :p");
+
+  observer4 = ObserverCreate(subject);
+
+  RemoveMeFromTheList(observer2);
+
+  // observer5 = ObserverCreate(subject);
+  // Подмена обощенной структуры специализацией
+  observer5 = create_spec(Observer.x);
+  ObserverInit(observer5, subject);
+
+  CreateMessage(subject, "My new car is great! ;)");
+
+  RemoveMeFromTheList(observer5);
+  RemoveMeFromTheList(observer4);
+  RemoveMeFromTheList(observer1);
+
+  ObserverDelete(observer5);
+  ObserverDelete(observer4);
+  ObserverDelete(observer3);
+  ObserverDelete(observer2);
+  ObserverDelete(observer1);
+  SubjectDelete(subject);
+}
+
+int main() {
+  ClientCode();
+  return 0;
+}
