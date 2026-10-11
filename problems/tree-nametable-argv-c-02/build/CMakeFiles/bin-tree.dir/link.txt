@@ -1,1 +1,0 @@
-ppclang -g -Wl,--dependency-file,CMakeFiles/bin-tree.dir/link.d "CMakeFiles/bin-tree.dir/nametable.c.o" "CMakeFiles/bin-tree.dir/value.c.o" "CMakeFiles/bin-tree.dir/pair.c.o" "CMakeFiles/bin-tree.dir/tree.c.o" "CMakeFiles/bin-tree.dir/main.c.o" -o "/home/al/Projects/EduProjects/Программирование/Динамические структуры/tree/nametable-argv-c-02/bin/bin-tree"

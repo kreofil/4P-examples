@@ -1,3 +1,0 @@
-@figureTest.exe
-@echo.
-@PAUSE

@@ -1,3 +1,0 @@
-/home/al/Projects/git-books/ppp/programs/problems/tree-c/build/CMakeFiles/bin-tree.dir
-/home/al/Projects/git-books/ppp/programs/problems/tree-c/build/CMakeFiles/edit_cache.dir
-/home/al/Projects/git-books/ppp/programs/problems/tree-c/build/CMakeFiles/rebuild_cache.dir

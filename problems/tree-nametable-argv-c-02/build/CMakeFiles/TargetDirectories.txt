@@ -1,3 +1,0 @@
-/home/al/Projects/EduProjects/Программирование/Динамические структуры/tree/nametable-argv-c-02/build/CMakeFiles/bin-tree.dir
-/home/al/Projects/EduProjects/Программирование/Динамические структуры/tree/nametable-argv-c-02/build/CMakeFiles/edit_cache.dir
-/home/al/Projects/EduProjects/Программирование/Динамические структуры/tree/nametable-argv-c-02/build/CMakeFiles/rebuild_cache.dir
