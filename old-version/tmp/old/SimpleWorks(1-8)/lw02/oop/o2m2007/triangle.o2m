@@ -1,0 +1,99 @@
+(*******************************************************************************
+| triangle.o: содержит модуль triangle с процедурами и типами, 
+| осуществляющими обработку треугольников
+*******************************************************************************)
+
+MODULE triangle; 
+IMPORT In, Out, FileIO, figure;
+
+(******************************************************************************)
+TYPE  
+  (* Структуры данных описывающие треугольник *)
+
+  (* Указатель на треугольник *)
+  Ptrian* = POINTER TO trian;
+
+  (* Запись, определяющая структуру треугольника *)
+  trian* = RECORD(figure.fig)
+    a*, b*, c* : INTEGER (* стороны треугольника*)
+  END;               
+
+(******************************************************************************)
+(* Процедура динамического создания и инициализации нового треугольника *)
+PROCEDURE New*(a, b, c: INTEGER): Ptrian;
+VAR tmp : Ptrian;
+BEGIN     
+    NEW(tmp);            
+    tmp^.a := a;
+    tmp^.b := b;      
+    tmp^.c := c;      
+    RETURN tmp
+END New; 
+
+(******************************************************************************)
+(* Процедура инициализации уже существующего треугольника *)
+PROCEDURE (VAR t: trian) Init*(a, b, c: INTEGER);
+BEGIN     
+    t.a := a;
+    t.b := b;
+    t.c := c;
+END Init; 
+
+(******************************************************************************)
+(* Процедура вычисления периметра треугольника - наследника фигуры *)
+PROCEDURE (VAR t: trian) Perimeter* () : REAL;
+VAR
+BEGIN          
+  RETURN t.a + t.b + t.c
+END Perimeter;
+
+(******************************************************************************)
+(* Процедура Заполнения треугольника из входного потока *)
+PROCEDURE (VAR t: trian) Input*;
+BEGIN     
+  Out.String("a = "); In.Int(t.a); 
+  Out.String("b = "); In.Int(t.b); 
+  Out.String("c = "); In.Int(t.c); 
+END Input; 
+
+(******************************************************************************)
+(* Процедура вывода треугольника - наследника фигуры *)
+PROCEDURE  (VAR t: trian) Output*;
+BEGIN          
+  Out.String("Triangle: a = "); Out.Int(t.a, 0); 
+  Out.String(", b = "); Out.Int(t.b, 0); 
+  Out.String(", c = "); Out.Int(t.c, 0); 
+  Out.String(",   perimemter = "); Out.Real(t.Perimeter(), 0); 
+  Out.Ln;
+END Output;
+
+(******************************************************************************)
+(* Процедура Заполнения треугольника из файла *)
+PROCEDURE (VAR t: trian)  FileInput*(VAR inFile : FileIO.TFile);
+VAR
+  f : INTEGER;
+BEGIN     
+  f := inFile.ReadInt(t.a); 
+  f := inFile.ReadInt(t.b); 
+  f := inFile.ReadInt(t.c); 
+END FileInput; 
+
+(******************************************************************************)
+(* Процедура вывода в файл треугольника - наследника фигуры *)
+PROCEDURE  (VAR t: trian) FileOutput*(VAR outFile : FileIO.TFile);
+VAR 
+  flag : INTEGER;
+BEGIN                  
+  flag := outFile.WriteString("Triangle: a = "); 
+  flag := outFile.WriteInt(t.a, 7); 
+  flag := outFile.WriteString(", b = ");         
+  flag := outFile.WriteInt(t.b, 7); 
+  flag := outFile.WriteString(", c = ");         
+  flag := outFile.WriteInt(t.c, 7); 
+  flag := outFile.WriteString(",   perimemter = "); 
+  flag := outFile.WriteReal(t.Perimeter(), 7); 
+  flag := outFile.Ln();
+END FileOutput;
+
+(******************************************************************************)
+END triangle.

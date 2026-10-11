@@ -1,0 +1,121 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Интерфейс Команды объявляет метод для выполнения команд.
+typedef struct Command {}<>Command;
+void Execute<Command* command>() = 0;
+
+// Некоторые команды способны выполнять простые операции самостоятельно.
+typedef struct SimpleCommand {
+  char payLoad[256];
+} SimpleCommand;
+Command + <SimpleCommand;>;
+
+void SimpleCommandInit(SimpleCommand* sc, char* payLoad) {
+  strcpy(sc->payLoad, payLoad);
+}
+
+Command* SimpleCommandCreate(char* payLoad) {
+  struct Command.SimpleCommand* c = create_spec(Command.SimpleCommand);
+  SimpleCommandInit(&(c->@), payLoad);
+  return (Command*)c;
+}
+
+void Execute<Command.SimpleCommand* c>() {
+  printf("SimpleCommand: See, I can do simple things like printing (%s)\n",
+         c->@payLoad);
+  }
+
+// Классы Получателей содержат некую важную бизнес-логику. Они умеют выполнять
+// все виды операций, связанных с выполнением запроса. Фактически, любой класс
+// может выступать Получателем.
+typedef struct Receiver {} Receiver;
+
+void DoSomething(Receiver* r, char* a) {
+  printf("Receiver: Working on (%s.)\n", a);
+}
+
+void DoSomethingElse(Receiver* r, char* b) {
+  printf("Receiver: Also working on (%s.)\n", b);
+}
+
+// Но есть и команды, которые делегируют более сложные операции другим объектам,
+// называемым «получателями».
+typedef struct ComplexCommand {
+  Receiver *receiver;
+  // Данные о контексте, необходимые для запуска методов получателя.
+  char a[256];
+  char b[256];
+} ComplexCommand;
+Command + <ComplexCommand;>;
+
+// Сложные команды могут принимать один или несколько объектов-получателей
+// вместе с любыми данными о контексте через конструктор.
+void ComplexCommandInit(ComplexCommand* cc, Receiver *receiver, char* a, char* b) {
+  cc->receiver = receiver;
+  strcpy(cc->a, a);
+  strcpy(cc->b, b);
+}
+
+Command* ComplexCommandCreate(Receiver *receiver, char* a, char* b) {
+  struct Command.ComplexCommand* c = create_spec(Command.ComplexCommand);
+  ComplexCommandInit(&(c->@), receiver, a, b);
+  return (Command*)c;
+}
+
+// Команды могут делегировать выполнение любым методам получателя.
+void Execute<Command.ComplexCommand* c>() {
+  printf("ComplexCommand: Complex stuff should be done by a receiver object.\n");
+    DoSomething(c->@receiver, c->@a);
+    DoSomethingElse(c->@receiver, c->@b);
+}
+
+// Отправитель связан с одной или несколькими командами. Он отправляет запрос
+// команде.
+typedef struct Invoker {
+  Command *onStart;
+  Command *onFinish;
+} Invoker;
+
+// Инициализация команд.
+void InvokerDelete(Invoker* invoker) {
+  free(invoker->onStart);
+  free(invoker->onFinish);
+}
+
+void SetOnStart(Invoker* invoker, Command *command) {
+  invoker->onStart = command;
+}
+
+void SetOnFinish(Invoker* invoker, Command *command) {
+    invoker->onFinish = command;
+}
+
+// Отправитель не зависит от классов конкретных команд и получателей.
+// Отправитель передаёт запрос получателю косвенно, выполняя команду.
+void DoSomethingImportant(Invoker* invoker) {
+  printf("Invoker: Does anybody want something done before I begin?\n");
+  if (invoker->onStart) {
+    Execute<invoker->onStart>();
+  }
+  printf("Invoker: ...doing something really important...\n");
+  printf("Invoker: Does anybody want something done after I finish?\n");
+  if (invoker->onFinish) {
+    Execute<invoker->onFinish>();
+  }
+}
+
+// Клиентский код может параметризовать отправителя любыми командами.
+int main() {
+  Invoker *invoker = malloc(sizeof(Invoker));
+  SetOnStart(invoker, SimpleCommandCreate("Say Hi!"));
+  Receiver *receiver = malloc(sizeof(Receiver));
+  SetOnFinish(invoker, ComplexCommandCreate(receiver, "Send email", "Save report"));
+  DoSomethingImportant(invoker);
+
+  InvokerDelete(invoker);
+  free(receiver);
+
+  return 0;
+}

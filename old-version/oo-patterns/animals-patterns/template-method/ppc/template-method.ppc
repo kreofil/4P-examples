@@ -1,0 +1,97 @@
+// Компилировать: ppclang -xc template-method.ppc -o template-method
+#include <stdio.h>
+
+//------------------------------------------------------------------------------
+// Обобщенное животное
+typedef struct Animal {
+  const char* name;
+  int age;
+}<> Animal;
+
+// Начальная инициализация вместо отсутствующего конструктора.
+void InitAnimal(Animal* a, const char* name, int age) {
+  a->name = name;
+  a->age = age;
+}
+
+// Вывод имени и возраста
+void PrintNameAndAge(Animal* a) {
+  printf("My name is %s. I'm %d years old.\n", a->name, a->age);
+}
+
+// Абстрактные обобщенные функции
+void Info<Animal* a>() = 0;
+void Voice<Animal* a>() = 0;
+void StandUp<Animal* a>() = 0;
+void Action<Animal* a>() = 0;
+
+// Имитация шаблонного метода, собирающего все воедино
+void Behavior(Animal* a) { // поведение - комплекс действий
+  Info<a>();
+  StandUp<a>();
+  Voice<a>();
+  Action<a>();
+}
+
+//------------------------------------------------------------------------------
+// Петух
+typedef struct Rooster {} Rooster;
+Animal + <rooster: Rooster;>;
+
+void Info<Animal.rooster* a>() {
+  printf("Hi! I am the Rooster. ");
+  PrintNameAndAge(a);
+};
+
+void StandUp<Animal.rooster* a>() {
+  printf("I shout \"Cock-a-doodle-doo!\" all day long\n");
+};
+
+void Voice<Animal.rooster* a>() {
+  printf("I get up early in the morning and go to bed when the sun sets.\n");
+};
+
+void Action<Animal.rooster* a>() {
+  printf("I spend all day chasing chickens.\n");
+};
+
+//------------------------------------------------------------------------------
+// Собака
+typedef struct Dog {} Dog;
+Animal + <dog: Dog;>;
+
+void Info<Animal.dog* a>() {
+  printf("Hello! I am the Dog. ");
+  PrintNameAndAge(a);
+};
+
+void StandUp<Animal.dog* a>() {
+  printf("I bark \"woof-woof\" when I see strangers.\n");
+};
+
+void Voice<Animal.dog* a>() {
+  printf("I sleep all day and wake up in the evening.\n");
+};
+
+void Action<Animal.dog* a>() {
+  printf("My job is to protect the house from burglars.\n");
+};
+
+// Клиент использует шаблонный метод через указатель на обобщение
+void ClientCode(Animal* a) {
+  Behavior(a);
+}
+
+int main() {
+  Animal.rooster rooster;
+  InitAnimal(&rooster, "Petya", 2);
+  ClientCode(&rooster);
+
+  printf("\n");
+
+  Animal.dog  dog;
+  InitAnimal(&dog, "Rex", 5);
+  ClientCode(&dog);
+
+  return 0;
+}

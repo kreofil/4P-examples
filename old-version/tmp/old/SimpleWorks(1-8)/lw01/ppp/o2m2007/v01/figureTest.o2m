@@ -1,0 +1,67 @@
+(* test.o: содержит процедуру, тестирующую различные процедуры *)
+
+MODULE figureTest; 
+IMPORT In, Out, FileIO, Console,
+       figure, rectangle, triangle, figureProc, container;
+VAR
+  flag : INTEGER;
+  c:  container.cont;
+  pf: figure.Pfig; 
+  inFile, outFile : FileIO.TFile;
+  str : ARRAY 100 OF CHAR;
+BEGIN         
+  (*------------------------------------------------------------------*)
+  (* Открытие файла, используемого для чтения исходных данных *)
+  Out.String("Input name of source file: ");
+  In.String(str);
+  inFile.Assign(str);
+(*  inFile.Assign("infile.txt"); *)
+  inFile.Reset;     
+
+  (*------------------------------------------------------------------*)
+  (* Открытие файла, используемого для записи результатов *)
+  Out.String("Input name of output file: ");
+  In.String(str);
+  outFile.Assign(str);
+(*  outFile.Assign("tmp.txt"); *)
+  outFile.Rewrite;     
+
+  (*------------------------------------------------------------------*)
+  (* Предварительная инициализаци контейнера *)
+  container.Init(c);
+
+  (*------------------------------------------------------------------*)
+  (* Тестовый вывод содержимого контейнера до начала работы *)
+  Out.String("Initialed Container is:");
+  container.Output(c);
+  Out.Ln;    
+
+  (*------------------------------------------------------------------*)
+  (* Чтение из файла в контейнер геометрических фигур                 *)
+  (*------------------------------------------------------------------*)
+
+  flag := container.FileInput(inFile, c);
+  Out.String("Result Container is:"); Out.Ln;    
+  container.Output(c);
+  flag := outFile.WriteString("Result Container is:"); flag := outFile.Ln();    
+  container.FileOutput(outFile, c);
+
+  (*------------------------------------------------------------------*)
+  (* Добавлен ввод фигур с консоли.                                   *)
+  (*------------------------------------------------------------------*)
+
+  Out.String("Input figures from console. "); Out.Ln;
+  container.Input(c);
+
+  Out.String("Result Container after console input is:"); Out.Ln;    
+  container.Output(c);
+  flag := outFile.WriteString("Result Container after console input  is:"); 
+  flag := outFile.Ln();    
+  container.FileOutput(outFile, c);
+               
+  (*------------------------------------------------------------------*)
+  (* Закрытие используемых файлов *)
+  inFile.Close;
+  outFile.Close;
+
+END figureTest.

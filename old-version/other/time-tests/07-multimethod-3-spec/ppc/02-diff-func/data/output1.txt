@@ -1,0 +1,41 @@
+Filled container.
+Container contains 17 elements.
+0: It is Rectangle: x = 11, y = 22
+1: It is Triangle: a = 33, b = 44, c = 55
+2: It is Circle: r = 10
+3: It is Rectangle: x = 45, y = 26
+4: It is Triangle: a = 66, b = 66, c = 66
+5: It is Circle: r = 5
+6: It is Rectangle: x = 111, y = 22
+7: It is Triangle: a = 303, b = 404, c = 505
+8: It is Rectangle: x = 145, y = 126
+9: It is Circle: r = 40
+10: It is Triangle: a = 166, b = 166, c = 166
+11: It is Circle: r = 14
+12: It is Rectangle: x = 113, y = 223
+13: It is Triangle: a = 33, b = 44, c = 25
+14: It is Circle: r = 20
+15: It is Rectangle: x = 15, y = 26
+16: It is Triangle: a = 666, b = 666, c = 666
+Perimeters of figures:
+0: 66.000000
+1: 132.000000
+2: 62.831853
+3: 142.000000
+4: 198.000000
+5: 31.415927
+6: 266.000000
+7: 1212.000000
+8: 542.000000
+9: 251.327412
+10: 498.000000
+11: 87.964594
+12: 672.000000
+13: 102.000000
+14: 125.663706
+15: 82.000000
+16: 1998.000000
+Common perimeter = 6469.203492
+Empty container.
+Container contains 0 elements.
+Delta time = 4.060395

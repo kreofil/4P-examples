@@ -1,0 +1,8 @@
+Result of building from Simple figures:
+Container contains 4 elements.
+0: It is Simple Rectangle: x = 20.000, y = 15.000
+1: It is Simple Rectangle: x = 100.000, y = 80.000
+2: It is Simple Rectangle: x = 20.000, y = 60.000
+3: It is Simple Triangle: a = 120.000, b = 80.000, c = 70.000
+Result of figures counting:
+    number of rectangles: 3    number of triangles: 1

@@ -1,0 +1,88 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Подсистема может принимать запросы либо от фасада, либо от клиента напрямую.
+// В любом случае, для Подсистемы Фасад – это еще один клиент, и он не является
+// частью Подсистемы.
+typedef struct Subsystem1 {} Subsystem1;
+
+char* Subsystem1_Operation1(Subsystem1* s) {
+  return "Subsystem1: Ready!\n";
+}
+// ...
+char* Subsystem1_OperationN(Subsystem1* s) {
+  return "Subsystem1: Go!\n";
+}
+
+// Некоторые фасады могут работать с разными подсистемами одновременно.
+typedef struct Subsystem2 {} Subsystem2;
+
+char* Subsystem2_Operation1(Subsystem2* s) {
+  return "Subsystem2: Get ready!\n";
+}
+// ...
+char* Subsystem2_OperationZ(Subsystem2* s) {
+  return "Subsystem2: Fire!\n";
+}
+
+// Фасад предоставляет простой интерфейс для сложной логики одной или
+// нескольких подсистем. Фасад делегирует запросы клиентов соответствующим
+// объектам внутри подсистемы. Фасад также отвечает за управление их жизненным
+// циклом. Все это защищает клиента от нежелательной сложности подсистемы.
+typedef struct Facade {
+  Subsystem1 *subsystem1;
+  Subsystem2 *subsystem2;
+  // В зависимости от потребностей вашего приложения вы можете предоставить
+  // Фасаду существующие объекты подсистемы или заставить Фасад создать их
+  // самостоятельно.
+} Facade;
+
+// In this case we will delegate the memory ownership to Facade Class
+Facade* FacadeCreate(Subsystem1 *subsystem1, Subsystem2 *subsystem2) {
+  Facade* f = malloc(sizeof(Facade));
+  f->subsystem1 = subsystem1 ?: malloc(sizeof(Subsystem1));
+  f->subsystem2 = subsystem2 ?: malloc(sizeof(Subsystem2));
+  return f;
+}
+
+void FacadeDelete(Facade* f) {
+  free(f->subsystem1);
+  free(f->subsystem2);
+}
+
+// Методы Фасада удобны для быстрого доступа к сложной функциональности
+// подсистем. Однако клиенты получают только часть возможностей подсистемы.
+void Operation(Facade* f, char* str) {
+  strcpy(str, "Facade initializes subsystems:\n");
+  strcat(str, Subsystem1_Operation1(f->subsystem1));
+  strcat(str, Subsystem2_Operation1(f->subsystem2));
+  strcat(str, "Facade orders subsystems to perform the action:\n");
+  strcat(str, Subsystem1_OperationN(f->subsystem1));
+  strcat(str, Subsystem2_OperationZ(f->subsystem2));
+}
+
+// Клиентский код работает со сложными подсистемами через простой интерфейс,
+// предоставляемый Фасадом. Когда фасад управляет жизненным циклом подсистемы,
+// клиент может даже не знать о существовании подсистемы. Такой подход позволяет
+// держать сложность под контролем.
+void ClientCode(Facade *facade) {
+  // ...
+  char str[256];
+  Operation(facade, str);
+  printf("%s", str);
+  // ...
+}
+
+// В клиентском коде могут быть уже созданы некоторые объекты подсистемы. В этом
+// случае может оказаться целесообразным инициализировать Фасад с этими
+// объектами вместо того, чтобы позволить Фасаду создавать новые экземпляры.
+int main() {
+  Subsystem1 *subsystem1 = malloc(sizeof(Subsystem1));
+  Subsystem2 *subsystem2 = malloc(sizeof(Subsystem2));
+  Facade *facade = FacadeCreate(subsystem1, subsystem2);
+  ClientCode(facade);
+  FacadeDelete(facade);
+
+  return 0;
+}

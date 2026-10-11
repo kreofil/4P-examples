@@ -1,0 +1,271 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+// Базовый класс Компонент объявляет общие операции как для простых, так и для
+// сложных объектов структуры.
+typedef struct Component Component;
+typedef struct Component {
+  Component *parent;
+}<> Component;
+
+// Список для наблюдателей. Создается как замена класса list
+// Элемент списка
+typedef struct ListElement {
+  Component* component;
+  struct ListElement* next;
+} ListElement;
+// Голова списка
+typedef struct List {
+  ListElement* first;
+  ListElement* last;
+} List;
+
+//------------------------------------------------------------------------------
+// Описание функций для работы со списком, использующим компонент
+//------------------------------------------------------------------------------
+
+// Начальная инициализация списка
+void ListInit(List* list) {
+  list->first = list->last = NULL;
+}
+
+// Добавление компонента в конец списка
+void ListPushBack(List* list, Component* component) {
+  ListElement* element = malloc(sizeof(ListElement));
+  element->component = component;
+  element->next = NULL;
+  if(list->first == NULL) {
+    list->first = element;
+    list->last = element;
+  } else {
+    list->last->next = element;
+    list->last = element;
+  }
+}
+
+// Поиск компонента в списке по совпадению указателя с последующим
+// удалением элемента списка без удаления компонента
+void ListRemove(List* list, Component* component) {
+  ListElement* e = list->first;
+  ListElement* pre = NULL;
+  while(e != NULL) {
+    if(e->component == component) {
+      if(e == list->first) { // первый в списке
+        // Если единственный в спискe
+        if(list->first == list->last) {
+          list->first = list->last = NULL;
+          free(e);
+          return;
+        }
+        list->first = e->next;
+        free(e);
+        return;
+      }
+      if(list->last == e) {
+        list->last = pre;
+      }
+      pre->next = e->next;
+      free(e);
+      return;
+    }
+    pre = e;
+    e = e->next;
+  }
+}
+
+//------------------------------------------------------------------------------
+// При необходимости базовый Компонент может объявить интерфейс для установки
+// и получения родителя компонента в древовидной структуре. Он также может
+// предоставить некоторую реализацию по умолчанию для этих методов.
+void SetParent(Component *self, Component *parent) {
+  self->parent = parent;
+}
+
+Component *GetParent(Component *self) {
+  return self->parent;
+}
+
+// В некоторых случаях целесообразно определить операции управления потомками
+// прямо в базовом классе Компонент. Таким образом, вам не нужно будет
+// предоставлять конкретные классы компонентов клиентскому коду, даже во время
+// сборки дерева объектов. Недостаток такого подхода в том, что эти методы
+// будут пустыми для компонентов уровня листа.
+void Add<Component *self>(Component *component) {}
+void Remove<Component *self>(Component *component) {}
+
+// Вы можете предоставить метод, который позволит клиентскому коду понять,
+// может ли компонент иметь вложенные объекты.
+_Bool IsComposite<Component *self>() {
+  return 0;
+}
+
+// Базовый Компонент может сам реализовать некоторое поведение по умолчанию
+// или поручить это конкретным классам, объявив метод, содержащий поведение
+// абстрактным.
+char* Operation<Component *self>(char* result) {return result;} //= 0;
+
+// Вывод информации о содержимом компонента
+void ComponentPrint<Component* component>() {
+  printf("Generalisation\n");
+}
+
+//------------------------------------------------------------------------------
+// Класс Лист представляет собой конечные объекты структуры. Лист не может иметь
+// вложенных компонентов.
+// Обычно объекты Листьев выполняют фактическую работу, тогда как объекты
+// Контейнера лишь делегируют работу своим подкомпонентам.
+typedef struct Leaf {} Leaf;
+Component + <Leaf;>;
+
+char* Operation<Component.Leaf* self>(char* result) {
+  strcpy(result, "Leaf");
+  return result;
+}
+
+// Вывод информации о содержимом компонента
+void ComponentPrint<Component.Leaf* component>() {
+  printf("Component is Leaf\n");
+}
+
+//------------------------------------------------------------------------------
+// Класс Контейнер содержит сложные компоненты, которые могут иметь вложенные
+// компоненты. Обычно объекты Контейнеры делегируют фактическую работу своим
+// детям, а затем «суммируют» результат.
+typedef struct Composite{List children;} Composite;
+Component + <Composite;>;
+
+// Инициализация композиции
+void CompositeInit(Composite* composite) {
+  ListInit(&(composite->children));
+}
+
+// Объект контейнера может как добавлять компоненты в свой список вложенных
+// компонентов, так и удалять их, как простые, так и сложные.
+void Add<Component.Composite* self>(Component *component) {
+  ListPushBack(&(self->@children), component);
+  SetParent(component, (Component*)self);
+}
+
+// Have in mind that this method removes the pointer to the list but doesn't
+// frees the memory, you should do it manually or better use smart pointers.
+void Remove<Component.Composite* self>(Component *component) {
+  // Удаляет из списка, по нахождению указателя на компонент
+  ListRemove(&(self->@children), component);
+  SetParent(component, NULL);
+}
+
+_Bool IsComposite<Component.Composite*self>() {
+  return 1;
+}
+
+// Контейнер выполняет свою основную логику особым образом. Он проходит
+// рекурсивно через всех своих детей, собирая и суммируя их результаты.
+// Поскольку потомки контейнера передают эти вызовы своим потомкам и так
+// далее, в результате обходится всё дерево объектов.
+char* Operation<Component.Composite* self>(char* result) {
+  ListElement* e = self->@children.first;
+  // printf("--- 001.1 ---\n");
+  char str[256];
+  strcat(result,"Branch(");   // Начало композиции
+  // Рекурсивный обход операции по иерархии композиции
+  while(e != NULL) {
+    str[0] = '\0';
+    if(e->next == NULL) { // Последний элемент списка
+      Operation<e->component>(str);
+      strcat(result, str);
+    } else { // Будет еще
+      Operation<e->component>(str);
+      strcat(result, str);
+      strcat(result, "+");
+    }
+    e = e->next;
+  }
+  strcat(result, ")");  // Завершение композиции
+  return result;
+}
+
+// Вывод информации о содержимом компонента
+void ComponentPrint<Component.Composite* self>() {
+  printf("Composite is\n");
+  ListElement* e = self->@children.first;
+  while(e != NULL) {
+    ComponentPrint<e->component>();
+    e = e->next;
+  }
+}
+
+
+//------------------------------------------------------------------------------
+// Клиентский код работает со всеми компонентами через базовый интерфейс.
+
+void ClientCode(Component *component) {
+  char str[256];
+  str[0] = '\0';
+  // ...
+  Operation<component>(str);
+  printf("RESULT: %s", str);
+  // ...
+}
+
+
+// Благодаря тому, что операции управления потомками объявлены в базовом классе
+// Компонента, клиентский код может работать как с простыми, так и со сложными
+// компонентами, вне зависимости от их конкретных классов.
+void ClientCode2(Component *component1, Component *component2) {
+  char str[256];
+  str[0] = '\0';
+  // ...
+  if (IsComposite<component1>()) {
+    Add<component1>(component2);
+  }
+  printf("RESULT: %s", Operation<component1>(str));
+  // ...
+}
+
+// Таким образом, клиентский код может поддерживать простые компоненты-листья...
+int main() {
+  Component *simple = create_spec(Component.Leaf);
+  printf("Client: I've got a simple component:\n");
+  ClientCode(simple);
+  printf("\n\n");
+
+  // ...а также сложные контейнеры.
+  struct Component.Composite *tree = create_spec(Component.Composite);
+  CompositeInit(&(tree->@));
+  struct Component.Composite *branch1 = create_spec(Component.Composite);
+  CompositeInit(&(branch1->@));
+
+  Component *leaf_1 = create_spec(Component.Leaf);
+  Component *leaf_2 = create_spec(Component.Leaf);
+  Component *leaf_3 = create_spec(Component.Leaf);
+  Add<(Component*)branch1>(leaf_1);
+  Add<(Component*)branch1>(leaf_2);
+
+  struct Component.Composite *branch2 = create_spec(Component.Composite);
+  CompositeInit(&(branch2->@));
+  Add<(Component*)branch2>(leaf_3);
+  Add<(Component*)tree>((Component*)branch1);
+  Add<(Component*)tree>((Component*)branch2);
+
+  printf("Client: Now I've got a composite tree:\n");
+  ClientCode((Component*)tree);
+  printf("\n\n");
+  // ComponentPrint<(Component*)tree>();
+  // printf("\n\n");
+
+  printf("Client: I don't need to check the components "
+         "classes even when managing the tree:\n");
+  ClientCode2((Component*)tree, simple);
+  printf("\n");
+
+  free(simple);
+  free(tree);
+  free(branch1);
+  free(branch2);
+  free(leaf_1);
+  free(leaf_2);
+  free(leaf_3);
+
+  return 0;
+}

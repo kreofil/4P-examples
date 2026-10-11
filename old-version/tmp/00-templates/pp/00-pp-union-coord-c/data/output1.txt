@@ -1,0 +1,12 @@
+Filled container.
+Container contains 8 elements.
+0: It is Coord Rectangle: top left = (3.000,4.000), down = (10.000,20.000)
+1: It is CoordTriangle: a = (1.000, 1.000), b = (1.000, 5.000), c = (5.000, 1.000)
+2: It is Coord Rectangle: top left = (30.000,40.000), down = (50.000,60.000)
+3: It is CoordTriangle: a = (2.000, 7.000), b = (2.000, 9.000), c = (10.000, 1.000)
+4: It is Coord Rectangle: top left = (13.000,14.000), down = (20.000,30.000)
+5: It is CoordTriangle: a = (10.000, 20.000), b = (20.000, 10.000), c = (10.000, 15.000)
+6: It is Coord Rectangle: top left = (330.000,49.000), down = (700.000,50.000)
+7: It is CoordTriangle: a = (3.000, 4.000), b = (5.000, 7.000), c = (10.000, 10.000)
+Empty container.
+Container contains 0 elements.

@@ -1,0 +1,112 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+// Поведение цепочки по умолчанию может быть реализовано внутри базового класса
+// обработчика.
+typedef struct Handler {struct Handler* next_handler;}<> Handler;
+
+// Формирование цепочки обработчиков (однонаправленный линейный список)
+Handler* SetNext(Handler* h, Handler *handler) {
+  h->next_handler = handler; // Указатель на следующий обработчик в цепочке
+  // Для аналогии с: monkey->setNext(squirrel)->setNext(dog);
+  return h;
+}
+// Прототип функции, обеспечивающей общий переход по умолчанию
+char* HandleDefault(Handler* h, char* request);
+// Выполнение обработчиком некоторой функции по умолчанию
+char* Handle<Handler* h>(char* request) {
+  return HandleDefault(h, request);
+}
+// Функция, обеспечивающая общий переход по умолчанию
+char* HandleDefault(Handler* h, char* request) {
+  // Рекурсивное обращение к следующему обработчику
+  if (h->next_handler != NULL) {
+    return Handle<h->next_handler>(request);
+  }
+  return ""; // return {};
+}
+
+// Все Конкретные Обработчики либо обрабатывают запрос, либо передают его
+// следующему обработчику в цепочке.
+typedef struct MonkeyHandler {} MonkeyHandler;
+Handler + <MonkeyHandler;>;
+
+char* Handle<Handler.MonkeyHandler* h>(char* request) {
+  if (!strcmp(request, "Banana")) {
+      return "Monkey: I'll eat the Banana.\n";
+    } else {
+      return HandleDefault((Handler*)h, request);
+    }
+  }
+
+typedef struct SquirrelHandler {} SquirrelHandler;
+Handler + <SquirrelHandler;>;
+
+char* Handle<Handler.SquirrelHandler* h>(char* request) {
+  if (!strcmp(request, "Nut")) {
+    return "Squirrel: I'll eat the Nut.\n";
+  } else {
+    return HandleDefault((Handler*)h, request);
+  }
+}
+
+typedef struct DogHandler {} DogHandler;
+Handler + <DogHandler;>;
+
+char* Handle<Handler.DogHandler* h>(char* request) {
+  if (!strcmp(request, "MeatBall")) {
+    return "Dog: I'll eat the MeatBall.\n";
+  } else {
+    return HandleDefault((Handler*)h, request);
+  }
+}
+
+// Обычно клиентский код приспособлен для работы с единственным обработчиком. В
+// большинстве случаев клиенту даже неизвестно, что этот обработчик является
+// частью цепочки.
+void ClientCode(Handler* handler) {
+  char* food[] = {"Nut", "Banana", "Cup of coffee"};
+  int foodNumber = sizeof(food)/sizeof(char*);
+  // printf("foodNumber = %d\n", foodNumber);
+  for (int i = 0; i < foodNumber; ++i) {
+    printf("Client: Who wants a %s?\n", food[i]);
+    char result[256];
+    strcpy(result, Handle<handler>(food[i]));
+    if (strcmp(result, "")) {
+      printf("  %s", result);
+    } else {
+      printf("  %s was left untouched.\n", food[i]);
+    }
+  }
+}
+
+// Другая часть клиентского кода создает саму цепочку.
+int main() {
+  Handler *monkey = create_spec(Handler.MonkeyHandler);
+  Handler *squirrel = create_spec(Handler.SquirrelHandler);
+  Handler *dog = create_spec(Handler.DogHandler);
+
+  // SetNext(dog, NULL);
+  // SetNext(squirrel, dog);
+  // SetNext(monkey, squirrel);
+
+  // Или по аналогии с: monkey->SetNext(squirrel)->SetNext(dog);
+  SetNext(monkey,
+          SetNext(squirrel,
+                  SetNext(dog, NULL)));
+
+  // Клиент должен иметь возможность отправлять запрос любому обработчику, а не
+  // только первому в цепочке.
+  printf("Chain: Monkey > Squirrel > Dog\n\n");
+  ClientCode(monkey);
+  printf("\n");
+  printf("Subchain: Squirrel > Dog\n\n");
+  ClientCode(squirrel);
+
+  free(monkey);
+  free(squirrel);
+  free(dog);
+
+  return 0;
+}

@@ -1,0 +1,154 @@
+//==============================================================================
+// multimethod.ppc - реализации мультиметода
+//==============================================================================
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include "multimethod.pph"
+
+//==============================================================================
+// Функции, реализующие отношения между парами животных
+//==============================================================================
+
+// Слон и слон
+void MultimethodElephantElephant(Elephant* e1, Elephant* e2) {
+  printf("Хоть мы и слоны, но до тебя доходит как до жирафа. ППП рулит!\n");
+}
+// Слон и собака
+void MultimethodElephantDog(Elephant* e, Dog* d) {
+  printf("Моська, мне Слону на тебя начхать.\n");
+}
+// Слон и пингвин
+void MultimethodElephantPenguin(Elephant* e, Penguin* p) {
+  printf("Слон с Пингвином разделены океаном\n");
+}
+// Слон и червяк
+void MultimethodElephantWorm(Elephant* e, Worm* w) {
+  printf("Слон Червяку: Извини. Растоптал и не заметил.\n");
+}
+
+// Собака и слон
+void MultimethodDogElephant(Dog* d, Elephant* e) {
+  printf("Я Моська! Я Сильна! Я лаю на слона!\n");
+}
+// Собака и собака
+void MultimethodDogDog(Dog* d1, Dog* d2) {
+  printf("Две собаки на охоте. За котами...\n");
+}
+// Собака и пингвин
+void MultimethodDogPenguin(Dog* d, Penguin* p) {
+  printf("Собака пингвину: поплыли до того берега этого ручья\n");
+}
+// Собака и червяк
+void MultimethodDogWorm(Dog* d, Worm* w) {
+  printf("Собака червей не ест.\n");
+}
+
+// Пингвин и слон
+void MultimethodPenguinElephant(Penguin* p, Elephant* e) {
+  printf("Пингвин: Эй, слон плыви ко мне. Будем бить окна.\n");
+}
+// Пингвин и собака
+void MultimethodPenguinDog(Penguin* p, Dog* d) {
+  printf("Пингвин собаке: поплыли до того берега этого океана\n");
+}
+// Пингвин и пингвин
+void MultimethodPenguinPenguin(Penguin* p1, Penguin* p2) {
+  printf("Антарктида. Холодно пингвинам.\n");
+}
+// Пингвин и червяк
+void MultimethodPenguinWorm(Penguin* p, Worm* w) {
+  printf("Пингвин в снегу не может отыскать червяка\n");
+}
+
+// Червяк и слон
+void MultimethodWormElephant(Worm* w, Elephant* e) {
+  printf("Червяк: Слон, в твоем желудке столько бананов...\n");
+}
+// Червяк и собака
+void MultimethodWormDog(Worm* w, Dog* d) {
+  printf("Червяк собаку не увидел.\n");
+}
+// Червяк и пингвин
+void MultimethodWormPenguin(Worm* w, Penguin* p2) {
+  printf("Червяк не хочет жить в Антарктиде у пингвинов.\n");
+}
+// Червяк и червяк
+void MultimethodWormWorm(Worm* w1, Worm* w2) {
+  printf("Червячок к червячку и на рыбалку.\n");
+}
+
+//------------------------------------------------------------------------------
+// Обобщающая функция, задающая интерфейс мультиметода
+void Multimethod<AnyAnimal* a1, AnyAnimal* a2>() {
+  printf("Ошибка: Мультиметод от обобщений должен быть переопределен!\n");
+  exit(2);
+}
+// Обработчик специализации для отношения слон - слон
+void Multimethod<AnyAnimal.elephant* a1, AnyAnimal.elephant* a2>() {
+  MultimethodElephantElephant(a1->@, a2->@);
+}
+// Обработчик специализации для отношения слон - собака
+void Multimethod<AnyAnimal.elephant* a1, AnyAnimal.dog* a2>() {
+  MultimethodElephantDog(a1->@, a2->@);
+}
+// Обработчик специализации для отношения слон - пингвин
+void Multimethod<AnyAnimal.elephant* a1, AnyAnimal.penguin* a2>() {
+  MultimethodElephantPenguin(a1->@, a2->@);
+}
+// Обработчик специализации для отношения слон - червяк
+void Multimethod<AnyAnimal.elephant* a1, AnyAnimal.worm* a2>() {
+  MultimethodElephantWorm(a1->@, a2->@);
+}
+
+// Обработчик специализации для отношения собака - слон
+void Multimethod<AnyAnimal.dog* a1, AnyAnimal.elephant* a2>() {
+  MultimethodDogElephant(a1->@, a2->@);
+}
+// Обработчик специализации для отношения собака - собака
+void Multimethod<AnyAnimal.dog* a1, AnyAnimal.dog* a2>() {
+  MultimethodDogDog(a1->@, a2->@);
+}
+// Обработчик специализации для отношения собака - пингвин
+void Multimethod<AnyAnimal.dog* a1, AnyAnimal.penguin* a2>() {
+  MultimethodDogPenguin(a1->@, a2->@);
+}
+// Обработчик специализации для отношения собака - червяк
+void Multimethod<AnyAnimal.dog* a1, AnyAnimal.worm* a2>() {
+  MultimethodDogWorm(a1->@, a2->@);
+}
+
+// Обработчик специализации для отношения пингвин - слон
+void Multimethod<AnyAnimal.penguin* a1, AnyAnimal.elephant* a2>() {
+  MultimethodPenguinElephant(a1->@, a2->@);
+}
+// Обработчик специализации для отношения пингвин - собака
+void Multimethod<AnyAnimal.penguin* a1, AnyAnimal.dog* a2>() {
+  MultimethodPenguinDog(a1->@, a2->@);
+}
+// Обработчик специализации для отношения пингвин - пингвин
+void Multimethod<AnyAnimal.penguin* a1, AnyAnimal.penguin* a2>() {
+  MultimethodPenguinPenguin(a1->@, a2->@);
+}
+// Обработчик специализации для отношения пингвин - червяк
+void Multimethod<AnyAnimal.penguin* a1, AnyAnimal.worm* a2>() {
+  MultimethodPenguinWorm(a1->@, a2->@);
+}
+
+// Обработчик специализации для отношения червяк - слон
+void Multimethod<AnyAnimal.worm* a1, AnyAnimal.elephant* a2>() {
+  MultimethodWormElephant(a1->@, a2->@);
+}
+// Обработчик специализации для отношения червяк - собака
+void Multimethod<AnyAnimal.worm* a1, AnyAnimal.dog* a2>() {
+  MultimethodWormDog(a1->@, a2->@);
+}
+// Обработчик специализации для отношения червяк - пингвин
+void Multimethod<AnyAnimal.worm* a1, AnyAnimal.penguin* a2>() {
+  MultimethodWormPenguin(a1->@, a2->@);
+}
+// Обработчик специализации для отношения червяк - червяк
+void Multimethod<AnyAnimal.worm* a1, AnyAnimal.worm* a2>() {
+  MultimethodWormWorm(a1->@, a2->@);
+}

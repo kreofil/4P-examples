@@ -1,0 +1,171 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+// Имеет смысл использовать паттерн Строитель только тогда, когда ваши продукты
+// достаточно сложны и требуют обширной конфигурации.
+// В отличие от других порождающих паттернов, различные конкретные строители
+// могут производить несвязанные продукты. Другими словами, результаты различных
+// строителей могут не всегда следовать одному и тому же интерфейсу.
+typedef struct Product1 {
+  int parts_size;
+  char parts[10][128];
+} Product1;
+
+void ListParts(Product1* p) {
+  printf("Product parts: ");
+  for (int i=0; i< p->parts_size; i++){
+    if(i == p->parts_size - 1) {
+      printf("%s", p->parts[i]);
+    } else {
+      printf("%s, ", p->parts[i]);
+    }
+  }
+  printf("\n\n");
+}
+
+// Добавление продукта в список
+
+// Интерфейс Строителя объявляет создающие методы для различных частей объектов
+// Продуктов.
+typedef struct Builder{}<> Builder;
+
+void ProducePartA<Builder* b>() {} //=0;
+void ProducePartB<Builder* b>() {} //=0;
+void ProducePartC<Builder* b>() {} //=0;
+
+// Классы Конкретного Строителя следуют интерфейсу Строителя и предоставляют
+// конкретные реализации шагов построения. Ваша программа может иметь несколько
+// вариантов Строителей, реализованных по-разному.
+typedef struct ConcreteBuilder1 {Product1* product;} ConcreteBuilder1;
+Builder + <ConcreteBuilder1;>;
+
+// Новый экземпляр строителя должен содержать пустой объект продукта,
+// который используется в дальнейшей сборке.
+void Reset(ConcreteBuilder1* b){
+  b->product= malloc(sizeof(Product1));
+  b->product->parts_size = 0;
+}
+
+void ConcreteBuilder1Init(ConcreteBuilder1* b){
+  Reset(b);
+}
+void ConcreteBuilder1Delete(ConcreteBuilder1* b){
+  free(b->product);
+}
+
+// Все этапы производства работают с одним и тем же экземпляром продукта.
+void ProducePartA<Builder.ConcreteBuilder1* b>() {
+  Product1* p = b->@product;
+  strcpy(p->parts[p->parts_size++], "PartA1");
+}
+void ProducePartB<Builder.ConcreteBuilder1* b>() {
+  Product1* p = b->@product;
+  strcpy(p->parts[p->parts_size++], "PartB1");
+}
+void ProducePartC<Builder.ConcreteBuilder1* b>() {
+  Product1* p = b->@product;
+  strcpy(p->parts[p->parts_size++], "PartC1");
+}
+
+// Конкретные Строители должны предоставить свои собственные методы
+// получения результатов. Это связано с тем, что различные типы строителей
+// могут создавать совершенно разные продукты с разными интерфейсами.
+// Поэтому такие методы не могут быть объявлены в базовом интерфейсе
+// Строителя (по крайней мере, в статически типизированном языке
+// программирования). Обратите внимание, что PHP является динамически
+// типизированным языком, и этот метод может быть в базовом интерфейсе.
+// Однако мы не будем объявлять его здесь для ясности.
+
+// Как правило, после возвращения конечного результата клиенту, экземпляр
+// строителя должен быть готов к началу производства следующего продукта.
+// Поэтому обычной практикой является вызов метода сброса в конце тела
+// метода getProduct. Однако такое поведение не является обязательным, вы
+// можете заставить своих строителей ждать явного запроса на сброс из кода
+// клиента, прежде чем избавиться от предыдущего результата.
+
+// Please be careful here with the memory ownership. Once you call
+// GetProduct the user of this function is responsable to release this
+// memory. Here could be a better option to use smart pointers to avoid
+// memory leaks
+
+Product1* GetProduct(ConcreteBuilder1* b) {
+  Product1* result= b->product;
+  Reset(b);
+  return result;
+}
+
+// Директор отвечает только за выполнение шагов построения в определённой
+// последовательности. Это полезно при производстве продуктов в определённом
+// порядке или особой конфигурации. Строго говоря, класс Директор необязателен,
+// так как клиент может напрямую управлять строителями.
+
+typedef struct Director{
+  // @var Builder
+  Builder* builder;
+} Director;
+
+// Директор работает с любым экземпляром строителя, который передаётся ему
+// клиентским кодом. Таким образом, клиентский код может изменить конечный
+// тип вновь собираемого продукта.
+void SetBuilder(Director* d, Builder* builder){
+  d->builder = builder;
+}
+
+// Директор может строить несколько вариаций продукта, используя одинаковые
+// шаги построения.
+void BuildMinimalViableProduct(Director* d){
+  ProducePartA<d->builder>();
+}
+
+void BuildFullFeaturedProduct(Director* d){
+  ProducePartA<d->builder>();
+  ProducePartB<d->builder>();
+  ProducePartC<d->builder>();
+}
+
+// Клиентский код создаёт объект-строитель, передаёт его директору, а затем
+// инициирует процесс построения. Конечный результат извлекается из объекта-
+// строителя.
+
+// I used raw pointers for simplicity however you may prefer to use smart
+// pointers here
+void ClientCode(Director* director) {
+    struct Builder.ConcreteBuilder1* builder = create_spec(Builder.ConcreteBuilder1);
+    Reset(&(builder->@));
+
+    SetBuilder(director, (Builder*)builder);
+
+    printf("Standard basic product:\n");
+    BuildMinimalViableProduct(director);
+
+    Product1* p = GetProduct(&(builder->@));
+    ListParts(p);
+    // free(p);
+
+    printf("Standard full featured product:\n");
+    BuildFullFeaturedProduct(director);
+
+    p = GetProduct(&(builder->@));
+    ListParts(p);
+    // free(p);
+
+    // Помните, что паттерн Строитель можно использовать без класса Директор.
+    printf("Custom product:\n");
+    ProducePartA<(Builder*)builder>();
+    ProducePartC<(Builder*)builder>();
+
+    p = GetProduct(&(builder->@));
+    ListParts(p);
+    // free(p);
+
+    free(builder);
+}
+
+int main(){
+    Director* director= malloc(sizeof(Director));
+    ClientCode(director);
+    free(director);
+
+    return 0;
+}

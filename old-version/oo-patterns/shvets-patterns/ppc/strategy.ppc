@@ -1,0 +1,114 @@
+#include <stdio.h>
+#include <string.h>
+// #include <memory>
+// #include <algorithm>
+
+// Алгоритм сортировки символов в строке, реализованный с использованием ППП
+typedef struct CmpOp {}<Lt, Gt: void> CmpOp;
+// Функции сортировки, порждаемые от обобщенной фунции
+_Bool Cmp<CmpOp* op>(char left, char right) {return 0;} //=0
+_Bool Cmp<CmpOp.Lt* op>(char left, char right) {
+  return left < right ? 1 : 0;
+}
+_Bool Cmp<CmpOp.Gt* op>(char left, char right) {
+  return left > right ? 1 : 0;
+}
+void StringSort(char* str, CmpOp* op) {
+  if(str[0] == '\0' || str[1] == '\0') return;
+  // Простой пузырьковый алгоритм
+  int i = 1;
+  while(str[i] != '\0') {
+    // if(str[i] < str[i-1]) {
+    if(Cmp<op>(str[i], str[i-1])) {
+      char tmp = str[i-1];
+      str[i-1] = str[i];
+      str[i] = tmp;
+      i = 1;
+    } else {
+      ++i;
+    }
+  }
+}
+
+//  Интерфейс Стратегии объявляет операции, общие для всех поддерживаемых версий
+//  некоторого алгоритма.
+//  Контекст использует этот интерфейс для вызова алгоритма, определённого
+//  Конкретными Стратегиями.
+typedef struct Strategy {}<> Strategy;
+void doAlgorithm<Strategy* s>(char* result, char* data) {} //= 0;
+
+//  Контекст определяет интерфейс, представляющий интерес для клиентов.
+typedef struct Context {
+  //  @var Strategy Контекст хранит ссылку на один из объектов Стратегии.
+  //  Контекст не знает конкретного класса стратегии. Он должен работать со
+  //  всеми стратегиями через интерфейс Стратегии.
+  Strategy* strategy;
+} Context;
+
+//  Обычно Контекст принимает стратегию через конструктор, а также
+//  предоставляет сеттер для её изменения во время выполнения.
+void ContextSet(Context* c, Strategy* strategy) {
+  c->strategy = strategy;
+}
+
+//  Вместо того, чтобы самостоятельно реализовывать множественные версии
+//  алгоритма, Контекст делегирует некоторую работу объекту Стратегии.
+void doSomeBusinessLogic(Context* c) {
+  if (c->strategy) {
+    printf(
+      "Context: Sorting data using the strategy (not sure how it'll do it)\n");
+    char result[256];
+    doAlgorithm<c->strategy>(result, "aecbd");
+    printf("%s\n", result);
+  } else {
+    printf("Context: Strategy isn't set\n");
+  }
+}
+
+//  Конкретные Стратегии реализуют алгоритм, следуя базовому интерфейсу
+//  Стратегии. Этот интерфейс делает их взаимозаменяемыми в Контексте.
+// typedef struct ConcreteStrategyA {} ConcreteStrategyA;
+// Strategy + <ConcreteStrategyA>;
+
+// А нужны ли в стратегии данны? Может проще использовать перечислимый тип?
+Strategy + <ConcreteStrategyA: void;>;
+
+void doAlgorithm<Strategy.ConcreteStrategyA* s>(char* result, char* data) {
+  strcpy(result, data);
+  struct CmpOp.Lt lt;
+  StringSort(result, (CmpOp*)&lt);
+}
+
+// typedef struct ConcreteStrategyB {} ConcreteStrategyB;
+// Strategy + <ConcreteStrategyB;>;
+Strategy + <ConcreteStrategyB: void;>;
+
+void doAlgorithm<Strategy.ConcreteStrategyB* s>(char* result, char* data) {
+  strcpy(result, data);
+  struct CmpOp.Gt gt;
+  StringSort(result, (CmpOp*)&gt);
+}
+
+//  Клиентский код выбирает конкретную стратегию и передаёт её в контекст. Клиент
+//  должен знать о различиях между стратегиями, чтобы сделать правильный выбор.
+void clientCode() {
+    Context context;
+    // char resultStr[256];
+
+    printf("Client: Strategy is set to normal sorting.\n");
+    struct Strategy.ConcreteStrategyA sa;
+    ContextSet(&context, (Strategy*)&sa);
+    doSomeBusinessLogic(&context);
+
+    printf("\n");
+
+    printf("Client: Strategy is set to reverse sorting.\n");
+    struct Strategy.ConcreteStrategyB sb;
+    ContextSet(&context, (Strategy*)&sb);
+    doSomeBusinessLogic(&context);
+}
+
+int main() {
+    clientCode();
+    return 0;
+}

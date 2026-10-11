@@ -1,0 +1,29 @@
+#ifndef __triangle__
+#define __triangle__
+
+//------------------------------------------------------------------------------
+// triangle.h - содержит описание класса треугольника,
+// порожденного от базового класса Figure
+//------------------------------------------------------------------------------
+
+// Требуется описание класса Figure
+#include "figure.h"
+
+//------------------------------------------------------------------------------
+// треугольник
+class Triangle: public Figure {
+  int a, b, c; // стороны
+public:
+  // переопределяем интерфейс класса
+  virtual void In(std::ifstream &ifst);  // ввод данных из потока
+  virtual void Out(std::ofstream &ofst);    // вывод данных в файл
+  virtual void Out();                       // вывод данных в cout
+  virtual std::string Multimethod(Figure& fig2); // мультиметод
+  virtual std::string FirstRectangle(Rectangle& rect);
+  virtual std::string FirstTriangle(Triangle& trian);
+  virtual std::string FirstCircle(Circle& circ);
+  Triangle(): a{0}, b{0}, c{0} {} // создание без инициализации.
+};
+
+#endif // __triangle__
+

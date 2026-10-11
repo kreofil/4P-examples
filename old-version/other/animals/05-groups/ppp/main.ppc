@@ -1,0 +1,124 @@
+//==============================================================================
+// main.ppc - содержит главную функцию,
+// обеспечивающую простое тестирование
+//==============================================================================
+
+#include <stdio.h>
+#include "animals.pph"
+#include "swimming-dog.pph" // Добавим собаку-пловца
+#include "diving.pph"       // Добавление ныряльщика. Только пингвин
+#include "eating.pph"       // Добавление питания с использованием общей группы
+#include "groups.pph"       // Добавление определителя принадлежности к группе
+
+//------------------------------------------------------------------------------
+int main(int argc, char* argv[]) {
+  Elephant  e;
+  Dog       d;
+  Penguin   p;
+  Worm      w;
+
+  printf("==== Использование общей группы животных. Перемещение ====\n");
+
+  printf("--- Прямое использование специализаций ---\n");
+  struct AnyAnimal.elephant ae;   ae.@ = &e;
+  struct AnyAnimal.dog      ad;   ad.@ = &d;
+  struct AnyAnimal.penguin  ap;   ap.@ = &p;
+  struct AnyAnimal.worm     aw;   aw.@ = &w;
+
+  Moving<(AnyAnimal*)&ae>();
+  Moving<(AnyAnimal*)&ad>();
+  Moving<(AnyAnimal*)&ap>();
+  Moving<(AnyAnimal*)&aw>();
+
+  printf("--- Использование специализаций через обобщенный указатель ---\n");
+  AnyAnimal* any;
+  any =  (AnyAnimal*)&ae;
+  Moving<any>();
+  any =  (AnyAnimal*)&ad;
+  Moving<any>();
+  any =  (AnyAnimal*)&ap;
+  Moving<any>();
+  any =  (AnyAnimal*)&aw;
+  Moving<any>();
+
+  printf("\n==== Использование группы пловцов ====\n");
+  printf("--- Прямое использование специализаций ---\n");
+  struct SwimmingAnimal.penguin  sp;   sp.@ = &p;
+  Swimming<(SwimmingAnimal*)&sp>();
+  struct SwimmingAnimal.dog  sd;   sd.@ = &d;
+  Swimming<(SwimmingAnimal*)&sd>();
+
+  printf("--- Использование специализаций через обобщенный указатель ---\n");
+  SwimmingAnimal* swimmer;
+  swimmer =  (SwimmingAnimal*)&sp;
+  Swimming<swimmer>();
+  swimmer =  (SwimmingAnimal*)&sd;
+  Swimming<swimmer>();
+
+  printf("\n==== Использование группы говорунов ====\n");
+  printf("--- Прямое использование специализаций ---\n");
+  struct SpeakingAnimal.elephant  spe;   spe.@ = &e;
+  Speaking<(SpeakingAnimal*)&spe>();
+  struct SpeakingAnimal.dog  spd;   spd.@ = &d;
+  Speaking<(SpeakingAnimal*)&spd>();
+  struct SpeakingAnimal.penguin  spp;   spp.@ = &p;
+  Speaking<(SpeakingAnimal*)&spp>();
+
+  printf("--- Использование специализаций через обобщенный указатель ---\n");
+  SpeakingAnimal* speaker;
+  speaker =  (SpeakingAnimal*)&spe;
+  Speaking<speaker>();
+  speaker =  (SpeakingAnimal*)&spd;
+  Speaking<speaker>();
+  speaker =  (SpeakingAnimal*)&spp;
+  Speaking<speaker>();
+
+  printf("\n==== Использование группы ныряльщиков ====\n");
+  printf("--- Прямое использование специализаций ---\n");
+  struct DivingAnimal.penguin  dp;   dp.@ = &p;
+  Diving<(DivingAnimal*)&dp>();
+
+  printf("--- Использование специализаций через обобщенный указатель ---\n");
+  DivingAnimal* diver;
+  diver =  (DivingAnimal*)&dp;
+  Diving<diver>();
+
+  printf("\n==== Использование общей группы животных. Питание ====\n");
+
+  printf("--- Прямое использование специализаций ---\n");
+  Eating<(AnyAnimal*)&ae>();
+  Eating<(AnyAnimal*)&ad>();
+  Eating<(AnyAnimal*)&ap>();
+  Eating<(AnyAnimal*)&aw>();
+
+  printf("--- Использование специализаций через обобщенный указатель ---\n");
+  any =  (AnyAnimal*)&ae;
+  Eating<any>();
+  any =  (AnyAnimal*)&ad;
+  Eating<any>();
+  any =  (AnyAnimal*)&ap;
+  Eating<any>();
+  any =  (AnyAnimal*)&aw;
+  Eating<any>();
+
+  printf("\n==== Определение принадлежности животных к конкретной группе ====\n");
+
+  printf("--- Прямое использование специализаций ---\n");
+  Group<(AnyAnimal*)&ae>();
+  Group<(AnyAnimal*)&ad>();
+  Group<(AnyAnimal*)&ap>();
+  Group<(AnyAnimal*)&aw>();
+
+  printf("--- Использование специализаций через обобщенный указатель ---\n");
+  any =  (AnyAnimal*)&ae;
+  Group<any>();
+  any =  (AnyAnimal*)&ad;
+  Group<any>();
+  any =  (AnyAnimal*)&ap;
+  Group<any>();
+  any =  (AnyAnimal*)&aw;
+  Group<any>();
+
+
+  return 0;
+}

@@ -1,0 +1,25 @@
+# C++, C, PPC  (rectangle + triangle + circle)
+
+## C++
+
+Delta time = 0.379299
+Delta time = 0.373506
+Delta time = 0.383149
+Delta time = 0.377713
+Delta time = 0.379143
+
+## PPC
+
+Delta time = 0.511346
+Delta time = 0.510314
+Delta time = 0.517399
+Delta time = 0.510241
+Delta time = 0.519063
+
+## C
+
+Delta time = 0.557903
+Delta time = 0.553475
+Delta time = 0.548016
+Delta time = 0.561198
+Delta time = 0.556767

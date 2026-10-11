@@ -1,0 +1,15 @@
+# C++, C, PPC  multimethod-2 (rectangle + triangle + circle)
+
+## C++
+
+
+## PPC
+
+
+## C
+
+Delta time =
+Delta time =
+Delta time =
+Delta time =
+Delta time =

@@ -1,0 +1,110 @@
+// Компилировать: ppclang -xc strategy-next.ppc -o strategy-next
+#include <stdio.h>
+
+// Обобщенная стратегия
+typedef struct Strategy {struct Strategy* nextStrategy;}<> Strategy;
+// Обобщающая функция, определяющая общую сигнатуру для алгоритмов
+void Action<Strategy* s>(char* name, int age) = 0;
+// Начальная инициализация стратегии
+void InitStrategy(Strategy* s) {s->nextStrategy = NULL;}
+// Установка стратегии внутри стратегии
+void SetNextStrategy(Strategy* s, Strategy* ns) {s->nextStrategy = ns;}
+// Функция, осуществляющая переадресацию на дополнительную стратегию
+void NextAction(Strategy* s, char* name, int age) {
+  if((Strategy*)s->nextStrategy != NULL) {
+    printf("\n    ");
+    Action<s->nextStrategy>(name, age);
+  }
+}
+
+// Конкретные стратегии задаются перечислимыми типом
+Strategy + <NameAge: void;>;
+Strategy + <AgeName: void;>;
+// Обработчики специализаций, определяемые конкрентным стратегиями.
+void Action<Strategy.NameAge* s>(char* name, int age) {
+  printf("Name is %s, age = %d", name, age);
+  // Необязательное действие, если алгоритму не нужно
+  NextAction((Strategy*)s, name, age);
+}
+void Action<Strategy.AgeName* s>(char* name, int age) {
+  printf("Age = %d, name is %s", age, name);
+  // Необязательное действие, если алгоритму не нужно
+  NextAction((Strategy*)s, name, age);
+}
+
+// Обобщенное животное
+typedef struct Animal {
+  Strategy* strategy;
+  char* name;
+  int age;
+}<> Animal;
+void GetInfo<Animal* a>() = 0;
+// Начальная инициализация вместо отсутствующего конструктора.
+void InitAnimal(Animal* a, char* name, int age) {
+  a->strategy = NULL;
+  a->name = name;
+  a->age = age;
+}
+// Установка стратегии для любого животного
+void SetStrategy(Animal* a, Strategy* s) {a->strategy = s;}
+// Использование стратегии животным
+void UseStrategy(Animal* a) {
+  GetInfo<a>();
+  if(a->strategy != NULL) {
+    printf(". ");
+    Action<a->strategy>(a->name, a-> age);
+  }
+  printf("\n");
+}
+
+// Утка
+typedef struct Duck {} Duck;
+Animal + <Duck;>;
+
+void GetInfo<Animal.Duck* a>() {
+  printf("I am the Duck");
+};
+
+// Собака
+typedef struct Dog {} Dog;
+Animal + <Dog;>;
+
+void GetInfo<Animal.Dog* a>() {
+  printf("I am the Dog");
+};
+
+// Клиент запускает сформированных животных
+void ClientCode(Animal* a) {
+  UseStrategy(a);
+}
+
+int main() {
+  struct Strategy.NameAge nas;
+  InitStrategy((Strategy*)&nas);
+  struct Strategy.AgeName ans;
+  InitStrategy((Strategy*)&ans);
+
+  struct Animal.Duck duck;
+  InitAnimal((Animal*)&duck, "Grey Neck", 2);
+  SetStrategy((Animal*)&duck, (Strategy*)&nas);
+  ClientCode((Animal*)&duck);
+  SetStrategy((Animal*)&duck, (Strategy*)&ans);
+  ClientCode((Animal*)&duck);
+
+  struct Animal.Dog  dog;
+  InitAnimal((Animal*)&dog, "Rex", 5);
+  SetStrategy((Animal*)&dog, (Strategy*)&nas);
+  ClientCode((Animal*)&dog);
+  SetStrategy((Animal*)&dog, (Strategy*)&ans);
+  ClientCode((Animal*)&dog);
+
+  struct Animal.Duck newDuck;
+  InitAnimal((Animal*)&newDuck, "Black Cape", 4);
+  SetStrategy((Animal*)&newDuck, (Strategy*)&nas);
+  SetNextStrategy((Strategy*)&nas, (Strategy*)&ans);
+  ClientCode((Animal*)&newDuck);
+  SetStrategy((Animal*)&newDuck, (Strategy*)&ans);
+  ClientCode((Animal*)&newDuck);
+
+  return 0;
+}

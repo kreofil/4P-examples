@@ -1,0 +1,12 @@
+{
+    "Auto_generated": "This file is auto-generated. Any extra tags or formatting will be lost",
+    "target_sets": [
+        {
+            "cmake_config": "Debug",
+            "directory": "/home/al/Projects/EduProjects/Программирование/Динамические структуры/tree/nametable-argv-c-02/build",
+            "loaded_via_cmake": true,
+            "name": "bin-tree@/home/al/Projects/EduProjects/Программирование/Динамические структуры/tree/nametable-argv-c-02/build - [Debug]",
+            "targets": null
+        }
+    ]
+}

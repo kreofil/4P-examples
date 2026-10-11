@@ -1,0 +1,67 @@
+#ifndef __mosquito__
+#define __mosquito__
+
+//==============================================================================
+// mosquito.pph - Добавление комара в качестве еще одного животного
+//==============================================================================
+
+#include "animals.pph"
+#include "eating.pph"
+#include "groups.pph"
+
+// Это комар
+typedef struct Mosquito {} Mosquito;
+// Он может издавать звон, что описано в реализации прототипа
+void MosquitoSpeaking(Mosquito* m);
+// Комар летает. Непонятно, может он ходит, хотя ноги есть.
+void MosquitoFlying(Mosquito* m);
+// И кровь он сосет. Кровосос!
+void MosquitoEating(Mosquito* m);
+
+// Группа для перемещений и еды
+AnyAnimal + <mosquito: Mosquito*;>;
+// Группа для звучания
+SpeakingAnimal + <mosquito: Mosquito*;>;
+
+//------------------------------------------------------------------------------
+// Появление группы насекомых
+typedef struct InsectGroup {}<> InsectGroup;
+// Включение в нее комара
+InsectGroup + <mosquito: void;>;
+// Включение насекомых в общую группу
+AnimalGroups + <InsectGroup;>;
+
+//------------------------------------------------------------------------------
+// Обобщение для летающих.
+typedef struct FlyingAnimal {} <> FlyingAnimal;
+// Пока только комар
+FlyingAnimal + <mosquito: Mosquito*;>;
+
+// Для этой группы своя обобщающая функция
+void Flying<FlyingAnimal* f>();
+
+//==============================================================================
+// Формирование прототипов для мультиметодов, учитывающих комара.
+//==============================================================================
+
+// Слон и комар
+void MultimethodElephantMosquito(Elephant* e, Mosquito* m);
+// Собака и комар
+void MultimethodDogMosquito(Dog* d, Mosquito* m);
+// Пингвин и комар
+void MultimethodPenguinMosquito(Penguin* p, Mosquito* m);
+// Червяк и комар
+void MultimethodWormMosquito(Worm* w, Mosquito* m);
+
+// Комар и слон
+void MultimethodMosquitoElephant(Mosquito* m, Elephant* e);
+// Комар и собака
+void MultimethodMosquitoDog(Mosquito* m, Dog* d);
+// Комар и пингвин
+void MultimethodMosquitoPenguin(Mosquito* m, Penguin* p);
+// Комар и червяк
+void MultimethodMosquitoWorm(Mosquito* m, Worm* w);
+// Комар и комар
+void MultimethodMosquitoMosquito(Mosquito* m1, Mosquito* m2);
+
+#endif // __mosquito__

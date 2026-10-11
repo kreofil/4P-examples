@@ -1,0 +1,91 @@
+(*******************************************************************************
+| figureproc.o: содержит модуль figureProc с процедурами, осуществляющими
+| обработку специализаций, связанных с обобщенной геометрической фигурой.
+| Эти процедуры лучше разместить после того, как будут созданы специализации,
+| т.к. их структуру необходимо знать во время обработки.
+*******************************************************************************)
+
+MODULE figureProc;
+IMPORT In, Out, FileIO, figure, rectangle, triangle;
+
+(******************************************************************************)
+(* Процедура, осуществляющая создание и ввод одной из специализаций  *)
+(* после предварительного анализа признака вводимой фигуры *)
+PROCEDURE Input*() : figure.Pfig;
+VAR
+  tag : INTEGER;
+  pf : figure.Pfig;
+  
+  r : rectangle.rect;
+  t : triangle.trian;
+
+  pfr : POINTER TO figure.fig<rect>;
+  pft : POINTER TO figure.fig<trian>;
+(*
+  pfr : figure.PfigRect;
+*)
+
+BEGIN
+  Out.String("Input figure tag (1 - rectangle; 2 - triangle; else - NIL): ");
+  Out.Ln;
+  In.Int(tag);
+
+  IF tag = 1 THEN
+    NEW(pfr);     
+    rectangle.Input(r); 
+(*    pfr^ := r; *)
+    pfr.x := r.x; pfr.y := r.y;
+    pf := pfr
+  ELSIF tag = 2 THEN
+    NEW(pft); 
+    triangle.Input(t); 
+(*    pft^ := t; *)
+    pft.a := t.a; pft.b := t.b; pft.c := t.c;
+    pf := pft
+  ELSE
+    pf := NIL
+  END;
+  RETURN pf
+
+END Input;
+
+(******************************************************************************)
+(* Процедура заполнения фигуры из файла *)
+PROCEDURE FileInput*(VAR inFile : FileIO.TFile) : figure.Pfig;
+VAR
+  flag : INTEGER;
+  tag : INTEGER;
+  pf : figure.Pfig;
+  
+  r : rectangle.rect;
+  t : triangle.trian;
+
+  pfr : POINTER TO figure.fig<rect>;
+  pft : POINTER TO figure.fig<trian>;
+(*
+  pfr : figure.PfigRect;
+*)
+
+BEGIN
+  flag := inFile.ReadInt(tag);
+
+  IF tag = 1 THEN
+    NEW(pfr);     
+    rectangle.FileInput(inFile, r); 
+(*    pfr^ := r; *)
+    pfr.x := r.x; pfr.y := r.y;
+    pf := pfr
+  ELSIF tag = 2 THEN
+    NEW(pft); 
+    triangle.FileInput(inFile, t); 
+(*    pft^ := t; *)
+    pft.a := t.a; pft.b := t.b; pft.c := t.c;
+    pf := pft
+  ELSE
+    pf := NIL
+  END;
+  RETURN pf
+
+END FileInput;
+
+END figureProc.

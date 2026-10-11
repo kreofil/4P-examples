@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+// #include <array>
+
+
+// Интерфейс Посетителя объявляет набор методов посещения, соответствующих
+// классам компонентов. Сигнатура метода посещения позволяет посетителю
+// определить конкретный класс компонента, с которым он имеет дело.
+typedef struct ConcreteComponentA {} ConcreteComponentA;
+// Функция, выполняемая конкретным компонентом A
+char* ExclusiveMethodOfConcreteComponentA(ConcreteComponentA* с) {
+  return "A";
+}
+
+typedef struct ConcreteComponentB {} ConcreteComponentB;
+// Функция, выполняемая конкретным компонентом B
+char* SpecialMethodOfConcreteComponentB(ConcreteComponentB* с) {
+  return "B";
+}
+
+typedef struct Visitor {}<> Visitor;
+void VisitConcreteComponentA<Visitor* v>(const ConcreteComponentA *с) = 0;
+void VisitConcreteComponentB<Visitor* v>(const ConcreteComponentB *с) = 0;
+
+typedef struct Component {}<> Component;
+// Обобщенная функци доступа к компоненту с передачей посетителя
+void Accept<Component* с>(Visitor *v) = 0; //{}
+
+// Каждый специализированный Компонент должен реализовать Accept,
+// чтобы он вызывал метод посетителя, соответствующий типу компонента.
+Component + <ConcreteComponentA;>;
+// Доступ к компоненту А
+void Accept<Component.ConcreteComponentA* с>(Visitor *v) {
+  VisitConcreteComponentA<v>(&(с->@));
+}
+
+Component + <ConcreteComponentB;>;
+// Доступ к компоненту B
+void Accept<Component.ConcreteComponentB* с>(Visitor *v) {
+  VisitConcreteComponentB<v>(&(с->@));
+}
+
+// Конкретные Посетители реализуют несколько версий одного и того же алгоритма,
+// которые могут работать со всеми классами конкретных компонентов.
+
+// Максимальную выгоду от паттерна Посетитель вы почувствуете, используя его со
+// сложной структурой объектов, такой как дерево Компоновщика. В этом случае
+// было бы полезно хранить некоторое промежуточное состояние алгоритма при
+// выполнении методов посетителя над различными объектами структуры.
+Visitor + <ConcreteVisitor1: void;>;
+void VisitConcreteComponentA<Visitor.ConcreteVisitor1* v>(ConcreteComponentA *c) {
+  char* str = ExclusiveMethodOfConcreteComponentA(c);
+  printf("%s + ConcreteVisitor1\n", str);
+}
+void VisitConcreteComponentB<Visitor.ConcreteVisitor1* v>(ConcreteComponentB *c) {
+  char* str = SpecialMethodOfConcreteComponentB(c);
+  printf("%s + ConcreteVisitor1\n", str);
+}
+
+Visitor + <ConcreteVisitor2: void;>;
+void VisitConcreteComponentA<Visitor.ConcreteVisitor2* v>(ConcreteComponentA *c) {
+  char* str = ExclusiveMethodOfConcreteComponentA(c);
+  printf("%s + ConcreteVisitor2\n", str);
+}
+void VisitConcreteComponentB<Visitor.ConcreteVisitor2* v>(ConcreteComponentB *c) {
+  char* str = SpecialMethodOfConcreteComponentB(c);
+  printf("%s + ConcreteVisitor2\n", str);
+}
+
+// Клиентский код может выполнять операции посетителя над любым набором
+// элементов, не выясняя их конкретных классов. Операция принятия направляет
+// вызов к соответствующей операции в объекте посетителя.
+void ClientCode(Component* components[], int len, Visitor *visitor) {
+  // ...
+  for (int i = 0; i < len; i++) {
+    Accept<components[i]>(visitor);
+  }
+  // ...
+}
+
+int main() {
+  Component* components[2];
+  components[0] = create_spec(Component.ConcreteComponentA);
+  components[1] = create_spec(Component.ConcreteComponentB);
+  printf("The client code works with all visitors via the base Visitor interface:\n");
+  Visitor* visitor1 = create_spec(Visitor.ConcreteVisitor1);
+  ClientCode(components, 2, visitor1);
+  printf("\n");
+  printf("It allows the same client code to work with different types of visitors:\n");
+  Visitor* visitor2 = create_spec(Visitor.ConcreteVisitor2);
+  ClientCode(components, 2, visitor2);
+
+  for (int i = 0; i < 2; i++) {
+    free(components[i]);
+  }
+  free(visitor1);
+  free(visitor2);
+
+  return 0;
+}

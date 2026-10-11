@@ -1,0 +1,15 @@
+IMPORT=C:\prog\O2M\Import\
+IMPORT=C:\prog\O2M\Import\SysUtils\
+IMPORT=C:\prog\O2M\Import\WinConsole\
+MAIN=figureTest.o
+EXEC=figureTest.exe
+TARGET=0
+FILE=figure.o
+FILE=rectangle.o
+FILE=rectarea.o
+FILE=triangle.o
+FILE=trianarea.o
+FILE=figureproc.o
+FILE=figarea.o
+FILE=container.o
+FILE=figureTest.o

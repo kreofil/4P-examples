@@ -1,0 +1,47 @@
+# set minimum cmake version
+cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
+project(strategy)               # Название проекта
+SET(CMAKE_C_COMPILER ppclang)
+set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type is Debug" FORCE)
+
+set(BUILD_DIR "${CMAKE_BINARY_DIR}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_DIR}/../bin")
+
+# Установка переменной со списком исходников
+set(SOURCE_FILES
+    # headers
+    figure.h
+    rectangle.h
+    figure-rectangle.h
+    triangle.h
+    figure-triangle.h
+    container.h
+    strategy.h
+
+    #sources
+    figure-in.c
+    figures-input.c
+    figure-out.c
+    figure-perimeter.c
+    figure-rectangle-in.c
+    figure-rectangle-out.c
+    figure-rectangle-perimeter.c
+    figure-triangle-in.c
+    figure-triangle-out.c
+    figure-triangle-perimeter.c
+    rectangle-in.c
+    rectangle-out.c
+    rectangle-perimeter.c
+    triangle-in.c
+    triangle-out.c
+    triangle-perimeter.c
+    container-constr.c
+    container-in.c
+    container-out.c
+    container-perimeter-out.c
+    strategy.c
+
+    main.c
+)
+
+add_executable(strategy ${SOURCE_FILES})

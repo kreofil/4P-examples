@@ -1,0 +1,97 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+// Абстрактный Класс определяет шаблонный метод, содержащий скелет некоторого
+// алгоритма, состоящего из вызовов (обычно) абстрактных примитивных операций.
+// Конкретные подклассы должны реализовать эти операции, но оставить сам
+// шаблонный метод без изменений.
+typedef struct AbstractClass {}<> AbstractClass;
+
+// Эти операции уже имеют реализации.
+void BaseOperation1(AbstractClass* ac) {
+  printf("AbstractClass says: I am doing the bulk of the work\n");
+}
+void BaseOperation2(AbstractClass* ac) {
+  printf("AbstractClass says: But I let subclasses override some operations\n");
+}
+void BaseOperation3(AbstractClass* ac) {
+  printf("AbstractClass says: But I am doing the bulk of the work anyway\n");
+}
+
+// А эти операции должны быть реализованы в подклассах.
+void RequiredOperations1<AbstractClass* ac>() = 0;
+void RequiredOperation2<AbstractClass* ac>() = 0;
+
+// Это «хуки». Подклассы могут переопределять их, но это не обязательно,
+// поскольку у хуков уже есть стандартная (но пустая) реализация. Хуки
+// предоставляют дополнительные точки расширения в некоторых критических
+// местах алгоритма.
+void Hook1<AbstractClass* ac>() {}
+void Hook2<AbstractClass* ac>() {}
+
+// Шаблонный метод определяет скелет алгоритма.
+void TemplateMethod(AbstractClass* ac) {
+  BaseOperation1(ac);
+  RequiredOperations1<ac>();
+  BaseOperation2<ac>();
+  Hook1<ac>();
+  RequiredOperation2<ac>();
+  BaseOperation3(ac);
+  Hook2<ac>();
+}
+
+// Конкретные классы должны реализовать все абстрактные операции базового
+// класса. Они также могут переопределить некоторые операции с реализацией по
+// умолчанию.
+typedef struct ConcreteClass1 {} ConcreteClass1;
+AbstractClass + <ConcreteClass1;>;
+
+void RequiredOperations1<AbstractClass.ConcreteClass1* cc>() {
+  printf("ConcreteClass1 says: Implemented Operation1\n");
+}
+void RequiredOperation2<AbstractClass.ConcreteClass1* cc>() {
+  printf("ConcreteClass1 says: Implemented Operation2\n");
+}
+
+// Обычно конкретные классы переопределяют только часть операций базового
+// класса.
+typedef struct ConcreteClass2 {}<> ConcreteClass2;
+AbstractClass + <ConcreteClass2;>;
+
+void RequiredOperations1<AbstractClass.ConcreteClass2* cc>() {
+  printf("ConcreteClass2 says: Implemented Operation1\n");
+}
+void RequiredOperation2<AbstractClass.ConcreteClass2* cc>() {
+  printf("ConcreteClass2 says: Implemented Operation2\n");
+}
+void Hook1<AbstractClass.ConcreteClass2* cc>() {
+  printf("ConcreteClass2 says: Overridden Hook1\n");
+}
+
+// Клиентский код вызывает шаблонный метод для выполнения алгоритма. Клиентский
+// код не должен знать конкретный класс объекта, с которым работает, при
+// условии, что он работает с объектами через интерфейс их базового класса.
+void ClientCode(AbstractClass *class) {
+  // ...
+  TemplateMethod(class);
+  // ...
+}
+
+int main() {
+  printf("Same client code can work with different subclasses:\n");
+  struct AbstractClass.ConcreteClass1 *concreteClass1
+                = create_spec(AbstractClass.ConcreteClass1);
+  ClientCode((AbstractClass*)concreteClass1);
+  printf("\n");
+
+  printf("Same client code can work with different subclasses:\n");
+  struct AbstractClass.ConcreteClass2 *concreteClass2
+                = create_spec(AbstractClass.ConcreteClass2);
+  ClientCode((AbstractClass*)concreteClass2);
+
+  free(concreteClass1);
+  free(concreteClass2);
+
+  return 0;
+}

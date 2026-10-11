@@ -1,0 +1,104 @@
+// Компилировать: ppclang -xc decorator.ppc -o decorator
+#include <stdio.h>
+
+// Обобщенное животное
+typedef struct Animal {}<> Animal;
+void GetInfo<Animal* a>() = 0;
+
+// Утка
+typedef struct Duck {} Duck;
+Animal + <Duck;>;
+
+void GetInfo<Animal.Duck* a>() {
+  printf("I am the Duck");
+};
+
+// Собака
+typedef struct Dog {} Dog;
+Animal + <Dog;>;
+
+void GetInfo<Animal.Dog* a>() {
+  printf("I am the Dog");
+};
+
+// Абстрактный декоратор для расширения животных
+typedef struct Decorator {Animal* animal;}<> Decorator;
+// Связывание декоратора с обобщенным животным
+void InitDecorator(Decorator* d, Animal* a) {
+  d->animal = a;
+}
+// Информация, порождаемая декораторами
+void GetDecoratorInfo<Decorator* d>() = 0;
+
+Animal + <Decorator;>;
+
+// Декоратор делегирует всю работу обёрнутому животному.
+void GetInfo<Animal.Decorator* a>() {
+  GetDecoratorInfo<&(a->@)>();
+}
+
+// Конкретные Декораторы вызывают обёрнутый объект
+// и изменяют его результат некоторым образом.
+typedef struct Age {int age;} Age;
+void InitAge(Age* a, int v) {
+  a->age = v;
+}
+
+Decorator + <Age;>;
+void InitAgeDecorator(struct Decorator.Age* da, Animal* a, int v) {
+  InitDecorator((Decorator*)da, a);
+  InitAge(&(da->@), v);
+}
+void GetDecoratorInfo<Decorator.Age* d>() {
+  // Перенаправление дальше
+  GetInfo<d->animal>();
+  printf(", I am %d yeas old.", d->@age);
+}
+typedef struct Name {char* name;} Name;
+void InitName(Name* a, char* n) {
+  a->name = n;
+}
+
+Decorator + <Name;>;
+void InitNameDecorator(struct Decorator.Name* dn, Animal* a, char* n) {
+  InitDecorator((Decorator*)dn, a);
+  InitName(&(dn->@), n);
+}
+void GetDecoratorInfo<Decorator.Name* d>() {
+  printf("My name is %s. ", d->@name);
+  GetInfo<d->animal>();
+}
+
+// Клиент запускает сформированных животных
+void ClientCode(Animal* a) {
+  printf("\n");
+  GetInfo<a>();
+  printf("\n");
+}
+
+int main() {
+  printf("Different Animals:\n");
+  struct Animal.Duck duck;
+  struct Animal.Dog  dog;
+
+  ClientCode((Animal*)&duck);
+  ClientCode((Animal*)&dog);
+
+  struct Animal.Decorator.Age duckAge;
+  InitAgeDecorator(&(duckAge.@), (Animal*)&duck, 2);
+  ClientCode((Animal*)&duckAge);
+
+  struct Animal.Decorator.Name dogName;
+  struct Animal.Decorator.Age  dogAge;
+  InitNameDecorator(&(dogName.@), (Animal*)&dog, "Rex");
+  InitAgeDecorator(&(dogAge.@), (Animal*)&dogName, 10);
+  ClientCode((Animal*)&dogAge);
+
+  struct Animal.Decorator.Name otherDogName;
+  struct Animal.Decorator.Age otherDogAge;
+  InitNameDecorator(&(otherDogName.@), (Animal*)&otherDogAge, "Mu-mu");
+  InitAgeDecorator(&(otherDogAge.@), (Animal*)&dog, 5);
+  ClientCode((Animal*)&otherDogName);
+
+  return 0;
+}

@@ -1,0 +1,43 @@
+# python
+
+## inheritance
+
+Delta time =  9.31318211555481
+Delta time =  9.505394458770752
+Delta time =  9.336844205856323
+Delta time =  9.547911643981934
+Delta time =  10.338663339614868
+
+## duck-typing
+
+Delta time =  9.580342769622803
+Delta time =  9.54482364654541
+Delta time =  9.329064130783081
+Delta time =  9.17060899734497
+Delta time =  9.299857378005981
+
+# C++, C, PPC
+
+## C++
+Delta time = 0.402494
+Delta time = 0.40547
+Delta time = 0.400443
+Delta time = 0.395265
+Delta time = 0.400741
+Delta time = 0.407056
+
+## PPC
+Delta time = 0.507572
+Delta time = 0.507116
+Delta time = 0.529702
+Delta time = 0.527935
+Delta time = 0.509242
+Delta time = 0.513328
+Delta time = 0.507815
+
+## C
+Delta time = 0.466270
+Delta time = 0.479131
+Delta time = 0.465617
+Delta time = 0.467984
+Delta time = 0.469982

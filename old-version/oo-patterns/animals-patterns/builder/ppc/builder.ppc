@@ -1,0 +1,201 @@
+// Компилировать: ppclang -xc builder.ppc -o builder
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+// В процедурно-параметрической реализации все вспомогательные данные -
+// просто структуры. Для упрощения вектор строк заменен двумерным массивом
+typedef struct Animals {
+  int animal_size;
+  char animalsList[10][128];
+} Animals;
+
+void ListParts(Animals* a) {
+  printf("Animal list:\n");
+  for (int i=0; i< a->animal_size; i++){
+    if(i == a->animal_size - 1) {
+      printf("    %s", a->animalsList[i]);
+    } else {
+      printf("    %s,\n", a->animalsList[i]);
+    }
+  }
+  printf("\n\n");
+}
+
+// Добавление животного в список
+
+// Интерфейс Строителя объявляет функции для создания описаний
+// купленных животных.
+typedef struct Builder{}<> Builder;
+void BuyDuck<Builder* b>() = 0;
+void BuyDog<Builder* b>()  = 0;
+
+// Программа может иметь несколько вариантов Строителей,
+// реализованных по-разному.
+typedef struct DomesticFarmBuilder {Animals* animals;} DomesticFarmBuilder;
+Builder + <DomesticFarmBuilder;>;
+
+// Все этапы производства работают с одним и тем же экземпляром продукта.
+void BuyDuck<Builder.DomesticFarmBuilder* b>() {
+  Animals* a = b->@animals;
+  strcpy(a->animalsList[a->animal_size++], "We have bought the Domestic Duck");
+}
+void BuyDog<Builder.DomesticFarmBuilder* b>() {
+  Animals* a = b->@animals;
+  strcpy(a->animalsList[a->animal_size++], "We have bought the Domestic Dog");
+}
+
+// Новый экземпляр строителя должен содержать пустой объект продукта,
+// который используется в дальнейшей сборке.
+void ResetDomestic(DomesticFarmBuilder* b){
+  b->animals= malloc(sizeof(Animals));
+  b->animals->animal_size = 0;
+}
+
+void DomesticFarmBuilderInit(DomesticFarmBuilder* b){
+  ResetDomestic(b);
+}
+void DomesticFarmBuilderDelete(DomesticFarmBuilder* b){
+  free(b->animals);
+}
+
+Animals* GetDomesticResult(DomesticFarmBuilder* b) {
+  Animals* result= b->animals;
+  ResetDomestic(b);
+  return result;
+}
+
+typedef struct ToyFarmBuilder {Animals* animals;} ToyFarmBuilder;
+Builder + <ToyFarmBuilder;>;
+
+// Все этапы производства работают с одним и тем же экземпляром продукта.
+void BuyDuck<Builder.ToyFarmBuilder* b>() {
+  Animals* a = b->@animals;
+  strcpy(a->animalsList[a->animal_size++], "We have bought the Toy Duck");
+}
+void BuyDog<Builder.ToyFarmBuilder* b>() {
+  Animals* a = b->@animals;
+  strcpy(a->animalsList[a->animal_size++], "We have bought the Toy Dog");
+}
+
+// Новый экземпляр строителя должен содержать пустой объект продукта,
+// который используется в дальнейшей сборке.
+void ResetToy(ToyFarmBuilder* b){
+  b->animals= malloc(sizeof(Animals));
+  b->animals->animal_size = 0;
+}
+
+void ToyFarmBuilderInit(ToyFarmBuilder* b){
+  ResetToy(b);
+}
+void ToyFarmBuilderDelete(ToyFarmBuilder* b){
+  free(b->animals);
+}
+
+Animals* GetToyResult(ToyFarmBuilder* b) {
+  Animals* result= b->animals;
+  ResetToy(b);
+  return result;
+}
+
+// Директор отвечает только за выполнение шагов построения в определённой
+// последовательности. Это полезно при производстве продуктов в определённом
+// порядке или особой конфигурации. Строго говоря, класс Директор необязателен,
+// так как клиент может напрямую управлять строителями.
+typedef struct Director{
+  Builder* builder;
+} Director;
+
+// Директор работает с любым экземпляром строителя, который передаётся ему
+// клиентским кодом. Таким образом, клиентский код может изменить конечный
+// тип вновь собираемого продукта.
+void SetBuilder(Director* d, Builder* builder){
+  d->builder = builder;
+}
+
+// Директор может строить несколько вариаций продукта, используя одинаковые
+// шаги построения.
+void BuildMinimalViableProduct(Director* d){
+  BuyDuck<d->builder>();
+}
+
+void BuildFullFeaturedProduct(Director* d){
+  BuyDuck<d->builder>();
+  BuyDog<d->builder>();
+}
+
+// Клиентский код создаёт объект-строитель, передаёт его директору, а затем
+// инициирует процесс построения. Конечный результат извлекается из объекта-
+// строителя.
+
+// I used raw pointers for simplicity however you may prefer to use smart
+// pointers here
+void ClientCode(Director* director) {
+    struct Builder.DomesticFarmBuilder* domesticBuilder
+                                = create_spec(Builder.DomesticFarmBuilder);
+    ResetDomestic(&(domesticBuilder->@));
+
+    SetBuilder(director, (Builder*)domesticBuilder);
+
+    printf("Standard basic domestic farm:\n");
+    BuildMinimalViableProduct(director);
+
+    Animals* a = GetDomesticResult(&(domesticBuilder->@));
+    ListParts(a);
+    // free(p);
+
+    printf("Standard full featured domestic farm:\n");
+    BuildFullFeaturedProduct(director);
+
+    a = GetDomesticResult(&(domesticBuilder->@));
+    ListParts(a);
+    // free(p);
+
+    // Помните, что паттерн Строитель можно использовать без класса Директор.
+    printf("Custom domestic farm:\n");
+    BuyDuck<(Builder*)domesticBuilder>();
+    BuyDog<(Builder*)domesticBuilder>();
+
+    a = GetDomesticResult(&(domesticBuilder->@));
+    ListParts(a);
+    free(domesticBuilder);
+
+    //-----------------------------------------------
+
+    struct Builder.ToyFarmBuilder* toyBuilder
+                                = create_spec(Builder.ToyFarmBuilder);
+    ResetToy(&(toyBuilder->@));
+
+    SetBuilder(director, (Builder*)toyBuilder);
+
+    printf("Standard basic toy's farm:\n");
+    BuildMinimalViableProduct(director);
+
+    a = GetToyResult(&(toyBuilder->@));
+    ListParts(a);
+    // free(p);
+
+    printf("Standard full featured toy's farm:\n");
+    BuildFullFeaturedProduct(director);
+
+    a = GetToyResult(&(toyBuilder->@));
+    ListParts(a);
+    // free(p);
+
+    // Помните, что паттерн Строитель можно использовать без класса Директор.
+    printf("Custom toy's farm:\n");
+    BuyDog<(Builder*)toyBuilder>();
+    BuyDuck<(Builder*)toyBuilder>();
+
+    a = GetToyResult(&(toyBuilder->@));
+    ListParts(a);
+    free(toyBuilder);
+}
+
+int main(){
+    Director* director= malloc(sizeof(Director));
+    ClientCode(director);
+    free(director);
+
+    return 0;
+}

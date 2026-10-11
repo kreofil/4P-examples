@@ -1,0 +1,102 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+
+// Базовый класс Состояния объявляет методы, которые должны реализовать все
+// Конкретные Состояния, а также предоставляет обратную ссылку на объект
+// Контекст, связанный с Состоянием. Эта обратная ссылка может использоваться
+// Состояниями для передачи Контекста другому Состоянию.
+typedef struct Context Context;
+
+typedef struct State {
+  Context *context;
+  char* name;
+}<> State;
+
+void SetStateContext(State* state, Context *context) {
+  state->context = context;
+}
+void SetStateName(State* state, char *name) {
+  state->name = name;
+}
+void Handle1<State* s>() = 0;
+void Handle2<State* s>() = 0;
+
+
+// Контекст определяет интерфейс, представляющий интерес для клиентов. Он также
+// хранит ссылку на экземпляр подкласса Состояния, который отображает текущее
+// состояние Контекста.
+typedef struct Context{State *state;} Context;
+
+// Контекст позволяет изменять объект Состояния во время выполнения.
+void TransitionTo(Context* context, State *state) {
+  printf("Context: Transition to %s.\n", state->name);
+  if (context->state != NULL) {
+    free(context->state);
+  }
+  context->state = state;
+  SetStateContext(context->state, context);
+}
+
+void InitContext(Context* context, State* state) {
+  context->state = NULL;
+  TransitionTo(context, state);
+}
+
+void DeleteContextAndState(Context *context) {
+  free(context->state);
+  free(context);
+}
+
+// Контекст делегирует часть своего поведения текущему объекту Состояния.
+void Request1(Context* context) {
+  Handle1<context->state>();
+}
+void Request2(Context* context) {
+  Handle2<context->state>();
+}
+
+// Конкретные Состояния реализуют различные модели поведения, связанные с
+// состоянием Контекста.
+State + <ConcreteStateA: void;>;
+State + <ConcreteStateB: void;>;
+
+void Handle1<State.ConcreteStateA* state>() {
+  printf("ConcreteStateA handles request1.\n");
+  printf("ConcreteStateA wants to change the state of the context.\n");
+  State* s = create_spec(State.ConcreteStateB);
+  SetStateName(s, "State.ConcreteStateB");
+  TransitionTo(state->context, s);
+}
+
+void Handle2<State.ConcreteStateA* state>(){
+  printf("ConcreteStateA handles request2.\n");
+}
+
+void Handle1<State.ConcreteStateB* state>(){
+  printf("ConcreteStateB handles request1.\n");
+}
+
+void Handle2<State.ConcreteStateB* state>() {
+  printf("ConcreteStateB handles request2.\n");
+  printf("ConcreteStateB wants to change the state of the context.\n");
+  State* s = create_spec(State.ConcreteStateA);
+  SetStateName(s, "State.ConcreteStateA");
+  TransitionTo(state->context, s);
+}
+
+// Клиентский код.
+void ClientCode() {
+  struct State* s =  create_spec(State.ConcreteStateA);
+  SetStateName(s, "State.ConcreteStateA");
+  Context *context = malloc(sizeof(Context));
+  InitContext(context, s);
+  Request1(context);
+  Request2(context);
+  DeleteContextAndState(context);
+}
+
+int main() {
+  ClientCode();
+  return 0;
+}

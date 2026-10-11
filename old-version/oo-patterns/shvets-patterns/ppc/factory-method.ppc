@@ -1,0 +1,103 @@
+// Компилировать: ppclang -xc factory-method.ppc -o factory-method
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+// Интерфейс Продукта объявляет операции, которые должны выполнять все
+// конкретные продукты.
+typedef struct Product {}<> Product;
+
+char* Operation<Product* p>() {return NULL;} // = 0;
+
+// Конкретные Продукты предоставляют различные реализации интерфейса Продукта.
+typedef struct ConcreteProduct1 {} ConcreteProduct1;
+Product + <ConcreteProduct1;>;
+
+char* Operation<Product.ConcreteProduct1* p>() {
+  return "{Result of the ConcreteProduct1}";
+}
+
+typedef struct ConcreteProduct2 {} ConcreteProduct2;
+Product + <ConcreteProduct2;>;
+
+char* Operation<Product.ConcreteProduct2* p>() {
+  return "{Result of the ConcreteProduct2}";
+}
+
+// Эвоюционно расширяемый перечислимый тип, обеспечивающий полиморфный выбор
+// функции создания продукта.
+typedef struct Creator {}<> Creator;
+// Обратите внимание, что Создатель может также обеспечить реализацию
+// фабричного метода по умолчанию.
+Product* FactoryMethod<Creator* c>() {return NULL;} // = 0;
+
+// Также заметьте, что, несмотря на название, основная обязанность Создателя
+// не заключается в создании продуктов. Обычно он содержит некоторую базовую
+// бизнес-логику, которая основана на объектах Продуктов, возвращаемых
+// фабричным методом. Подклассы могут косвенно изменять эту бизнес-логику,
+// переопределяя фабричный метод и возвращая из него другой тип продукта.
+void SomeOperation(Creator* c, char* buf) {
+  // Вызываем фабричный метод, чтобы получить объект-продукт.
+  Product* product = FactoryMethod<c>();
+  // Далее, работаем с этим продуктом.
+  char* result = "Creator: The same creator's code has just worked with ";
+  strcpy(buf, result);
+  strcat(buf, Operation<product>());
+  free(product);
+}
+
+// Конкретные Создатели переопределяют фабричный метод для того, чтобы изменить
+// тип результирующего продукта.
+typedef struct ConcreteCreator1 {} ConcreteCreator1;
+Creator + <ConcreteCreator1;>;
+// Обратите внимание, что сигнатура метода по-прежнему использует тип
+// абстрактного продукта, хотя фактически из метода возвращается конкретный
+// продукт. Таким образом, Создатель может оставаться независимым от
+// конкретных классов продуктов.
+Product* FactoryMethod<Creator.ConcreteCreator1* p>() {
+    return create_spec(Product.ConcreteProduct1);
+}
+
+typedef struct ConcreteCreator2 {} ConcreteCreator2;
+Creator + <ConcreteCreator2;>;
+Product* FactoryMethod<Creator.ConcreteCreator2* p>() {
+  return create_spec(Product.ConcreteProduct2);
+}
+
+// Клиентский код работает с экземпляром конкретного создателя, хотя и через его
+// базовый интерфейс. Пока клиент продолжает работать с создателем через базовый
+// интерфейс, вы можете передать ему любой подкласс создателя.
+void ClientCode(Creator* creator) {
+  // ...
+  printf("Client: I'm not aware of the creator's class, but it still works.\n");
+  char buf[256];
+  SomeOperation(creator, buf);
+  printf("%s\n", buf);
+  // ...
+}
+
+// Приложение выбирает тип создателя в зависимости от конфигурации или среды.
+int main() {
+  // Использование динамического выделения памяти
+  printf("App: Launched with the ConcreteCreator1.\n");
+  Creator* creator = create_spec(Creator.ConcreteCreator1);
+  ClientCode(creator);
+  printf("\n");
+  printf("App: Launched with the ConcreteCreator2.\n");
+  Creator* creator2 = create_spec(Creator.ConcreteCreator2);
+  ClientCode(creator2);
+  free(creator);
+  free(creator2);
+
+  // Использование автоматического выделения памяти
+  printf("\n");
+  printf("App: Launched with the ConcreteCreator1.\n");
+  struct Creator.ConcreteCreator1 creator3;
+  ClientCode((Creator*)&creator3);
+  printf("\n");
+  printf("App: Launched with the ConcreteCreator2.\n");
+  struct Creator.ConcreteCreator2 creator4;
+  ClientCode((Creator*)&creator4);
+
+  return 0;
+}

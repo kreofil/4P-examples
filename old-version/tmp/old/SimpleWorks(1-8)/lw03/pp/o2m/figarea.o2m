@@ -1,0 +1,23 @@
+(*******************************************************************************
+| figarea.o: содержит модуль figarea с процедурами, осуществл€ющими 
+| вывод площадей обощенной фигуры.
+*******************************************************************************)
+
+MODULE figarea; 
+IMPORT In, Out, FileIO, figure, rectangle, triangle, rectarea, trianarea;
+
+(******************************************************************************)
+(* ѕроцедура, вычисл€юща€ площадь обобщенной фигуры *)
+PROCEDURE Area*(VAR f: figure.fig) : REAL;     
+VAR
+  p : REAL;
+BEGIN 
+  WITH f: rectangle.rect DO p := rectarea.Area(f)
+     | f: triangle.trian DO p := trianarea.Area(f)
+  ELSE p := 0
+  END;  
+  RETURN p     
+
+END Area;
+
+END figarea.

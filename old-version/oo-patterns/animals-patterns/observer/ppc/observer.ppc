@@ -1,0 +1,476 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+
+// Паттерн Наблюдатель с позиций процедурно-параметрического подхода
+
+// Назначение: Создаёт механизм подписки, позволяющий наблюдателям следить и
+// реагировать на события, происходящие в некоторых субъектах.
+
+//------------------------------------------------------------------------------
+// Общие понятия субъекта и наблюдателя
+//------------------------------------------------------------------------------
+// Предварительное описание для использования в качестве указателя
+typedef struct Observer Observer;
+
+// Список для наблюдателей. Создается как замена ОО класса list
+typedef struct ListElement { // Элемент списка
+  Observer* observer;
+  struct ListElement* next;
+} ListElement;
+
+typedef struct List { // Голова списка
+  ListElement* first;
+  ListElement* last;
+} List;
+
+//------------------------------------------------------------------------------
+// Обобщенный субъект ссылается на подключаемые к нему наблюдатели
+typedef struct Subject {
+  List listObserver;  // Список доступных наблюдателей
+}<> Subject;
+
+//------------------------------------------------------------------------------
+// Обобщенный наблюдатель косвенно через обработчики связывается с субъектами.
+// Общих данных нет, но могут быть в более сложной реализации.
+typedef struct Observer {}<> Observer;
+
+//==============================================================================
+// Описание интерфейса для работы со списком обобщенных наблюдателей
+//==============================================================================
+// Начальная инициализация списка
+void ListInit(List* list) {
+  list->first = list->last = NULL;
+}
+// Добавление наблюдателя в конец списка
+void ListPushBack(List* list, Observer* observer) {
+  ListElement* element = malloc(sizeof(ListElement));
+  element->observer = observer;
+  element->next = NULL;
+  if(list->first == NULL) {
+    list->first = element;
+    list->last = element;
+  } else {
+    list->last->next = element;
+    list->last = element;
+  }
+}
+
+//------------------------------------------------------------------------------
+int ListSize(List* list) { // Определение длины списка
+  int count = 0;
+  ListElement* e = list->first;
+  while(e != NULL) {
+    ++count;
+    e = e->next;
+  }
+  return count;
+}
+//------------------------------------------------------------------------------
+// Поиск и удаление наблюдателя из списка по совпадению указателей
+void ListRemove(List* list, Observer* observer) {
+  ListElement* e = list->first;
+  ListElement* pre = NULL;
+  while(e != NULL) {
+    if(e->observer == observer) {
+      if(e == list->first) { // первый в списке
+        // Если единственный в спискe
+        if(list->first == list->last) {
+          list->first = list->last = NULL;
+          free(e);
+          return;
+        }
+        list->first = e->next;
+        free(e);
+        return;
+      }
+      if(list->last == e) {
+        list->last = pre;
+      }
+      pre->next = e->next;
+      free(e);
+      return;
+    }
+    pre = e;
+    e = e->next;
+  }
+}
+
+//==============================================================================
+// Описание функций, определяющих работу субъекта
+//==============================================================================
+
+// Инициализация обобщенного субъекта
+void SubjectInit(Subject* subject) {
+  ListInit(&subject->listObserver);
+}
+// Прототип предварительной проверки на совместимость субъекта и наблюдателя
+_Bool isCorrect<Subject* subject, Observer* observer>();
+//------------------------------------------------------------------------------
+// Подписка субъекта на заданного наблюдателя
+void Attach(Subject* subject, Observer *observer) {
+  ListPushBack(&(subject->listObserver), observer);
+}
+//------------------------------------------------------------------------------
+// Отсоединение наблюдателя от списка заданного субъекта
+void Detach(Subject* subject, Observer *observer) {
+  ListRemove(&(subject->listObserver), observer);
+}
+//------------------------------------------------------------------------------
+// Удаление наблюдателя из динамической памяти по указателю
+void SubjectDelete(Subject* subject) {
+  printf("Goodbye, I was the Subject.\n");
+  free(subject);
+}
+//------------------------------------------------------------------------------
+//  Информация о числе наблюдателей за субъектом (не знаю, зачем)
+void HowManyObservers(Subject* subject) {
+  printf("Observers in the list: %d\n",
+             ListSize(&(subject->listObserver)));
+}
+//------------------------------------------------------------------------------
+// Прототипы обобщенных функций, используемых при обработке взаимодействий
+// субъектов и наблюдателей
+void GetAndUpdate<Subject* subject, Observer* observer>();
+void PrintSubjectInfo<Subject* subject>();
+void PrintObserverInfo<Observer* observer>();
+
+// Функция, осуществляющая обход наблюдателей и выполнение в них нужных
+// манипуляций
+void NotifyAllObservers(Subject* subject) {
+  HowManyObservers(subject);
+  // Обход субьектом своих наблюдателей
+  ListElement* e = subject->listObserver.first;
+  while(e != NULL) {
+    // и передача ему необходимой информации через обобщенную функцию
+    GetAndUpdate<subject, e->observer>();
+    PrintSubjectInfo<subject>();
+    PrintObserverInfo<e->observer>();
+    e = e->next;
+  }
+}
+
+// Обобщенная функция, задающая обработку данных субъекта в наблюдателе
+// Функции субъекта и наблюдателя реализованы непосредственно, так как
+// простые. Но могут предоставляться как отдельный функционал.
+void GetAndUpdate<Subject* subject, Observer* observer>() {
+  // Нельзя использовать обобщения
+  printf("Incorrect Combination of Subject and Observer:\n");
+  // PrintSubjectInfo<subject>();  // Вывод информации о специализации субьекта
+  // PrintObserverInfo<observer>(); // Вывод информации о специализации наблюдателя
+  // exit(13);
+}
+//------------------------------------------------------------------------------
+// Вывод информации об обобщенном субьекте
+void PrintSubjectInfo<Subject* subject>() {
+  printf("   Subject is Generalization;\n");
+}
+//------------------------------------------------------------------------------
+// Вывод информации о специализации наблюдателя
+void PrintObserverInfo<Observer* observer>() {
+  printf("   Observer is Generalization;\n");
+}
+
+//==============================================================================
+// Описание основ специализированных субъектов и построение их специализаций
+//==============================================================================
+
+// Для субъектов, использующих только целые типы, одна основа и разны признаки
+typedef struct IntIntBaseSpec {int x1, x2;} IntIntBaseSpec;
+//------------------------------------------------------------------------------
+// Функция сложения над основой
+int Add(IntIntBaseSpec* opd) {
+  return opd->x1 + opd->x2;
+}
+//------------------------------------------------------------------------------
+// Функция вычитания над основой
+int Sub(IntIntBaseSpec* opd) {
+  return opd->x1 - opd->x2;
+}
+
+//==============================================================================
+// Специализации субьектов
+//==============================================================================
+
+// Специализация субьекта, используемая для сложения
+Subject + <add: IntIntBaseSpec;>;
+//------------------------------------------------------------------------------
+// Вывод информации о специализации сложения
+void PrintSubjectInfo<Subject.add* subject>() {
+  printf("   Subject is Addition;\n");
+}
+//------------------------------------------------------------------------------
+// Инициализация специализации сложения
+void AddSubjectInit(Subject.add* subject) {
+  ListInit(&subject->listObserver);
+  subject->@x1 = 0;
+  subject->@x2 = 0;
+}
+//------------------------------------------------------------------------------
+// Изменение данных в специализации сложения
+void AddSubjectSet(Subject.add* subject, int x1, int x2) {
+  subject->@x1 = x1;
+  subject->@x2 = x2;
+}
+//------------------------------------------------------------------------------
+// Изменение данных в специализации сложения и обновление наблюдателей
+void AddSubjectSetAndNotify(Subject.add* subject, int x1, int x2) {
+  AddSubjectSet(subject, x1, x2);
+  NotifyAllObservers(subject);
+}
+
+//------------------------------------------------------------------------------
+// Специализация субьекта, используемая для вычитания
+// Subject + <sub: IntIntBaseSpec;>;
+
+//==============================================================================
+// Специализации наблюдателей
+//==============================================================================
+
+// Специализация наблюдателя, используемая для вывода в десятичном виде.
+// Для нашей простой реализации достаточно эволюционно расширяемого
+// перечислимого типа.
+Observer + <decimal: void;>;
+//------------------------------------------------------------------------------
+// Вывод информации о десятичном наблюдателе
+void PrintObserverInfo<Observer.decimal* observer>() {
+  printf("   Observer is Decimal;\n");
+}
+//------------------------------------------------------------------------------
+// Еще одна специализация наблюдателя, для вывода в шестнадцатиричном виде
+Observer + <hex: void;>;
+//------------------------------------------------------------------------------
+// Вывод информации о шестнадцатиричном наблюдателе
+void PrintObserverInfo<Observer.hex* observer>() {
+  printf("   Observer is Hex;\n");
+}
+//------------------------------------------------------------------------------
+// Cпециализация наблюдателя, для вывода с плавающей точкой двойной точности
+Observer + <dbl: void;>;
+//------------------------------------------------------------------------------
+// Вывод информации о шестнадцатиричном наблюдателе
+void PrintObserverInfo<Observer.dbl* observer>() {
+  printf("   Observer is Double;\n");
+}
+
+//==============================================================================
+// Мультиметод, формирующий отношения между специализациями
+//==============================================================================
+
+// Обработка комбинации Сложение - десятичный наблюдатель
+void GetAndUpdate<Subject.add* subject, Observer.decimal* observer>() {
+  // Формирование суммы связано с субьектом.
+  int result = Add(&(subject->@));
+  // Вывод в десятичном виде связан с наблюдателем
+  printf("Addition->Decimal: %d + %d = %d\n", subject->@x1, subject->@x2, result);
+}
+//------------------------------------------------------------------------------
+// Обработка комбинации Сложение - шестнадцатиричный наблюдатель
+void GetAndUpdate<Subject.add* subject, Observer.hex* observer>() {
+  // Формирование суммы связано с субьектом.
+  int result = Add(&(subject->@));
+  // Вывод в десятичном виде связан с наблюдателем
+  printf("Addition->Hex: 0x%X + 0x%X = 0x%X\n", subject->@x1, subject->@x2, result);
+}
+//------------------------------------------------------------------------------
+// Пусть для числа с плавающей точкой отсутствует специальный обработчик
+// ...
+
+//------------------------------------------------------------------------------
+// Еще одна специализация субьекта, используемая для деления
+Subject + <div: IntIntBaseSpec;>;
+//------------------------------------------------------------------------------
+// Вывод информации о специализации деления
+void PrintSubjectInfo<Subject.div* subject>() {
+  printf("   Subject is Divide;\n");
+}
+//------------------------------------------------------------------------------
+// Инициализация специализации деления
+void DivSubjectInit(Subject.div* subject) {
+  ListInit(&subject->listObserver);
+  subject->@x1 = 0;
+  subject->@x2 = 0;
+}
+
+//------------------------------------------------------------------------------
+// Изменение данных в специализации деления
+void DivSubjectSet(Subject.div* subject, int x1, int x2) {
+  subject->@x1 = x1;
+  subject->@x2 = x2;
+}
+
+//------------------------------------------------------------------------------
+// Изменение данных в специализации деления и обновление наблюдателей
+void DivSubjectSetAndNotify(Subject.div* subject, int x1, int x2) {
+  DivSubjectSet(subject, x1, x2);
+  NotifyAllObservers(subject);
+}
+
+//------------------------------------------------------------------------------
+// После этого можно дописать используемые им наблюдатели
+//------------------------------------------------------------------------------
+// Наблюдатель, использующий целочисленный десятичный вывод
+void GetAndUpdate<Subject.div* subject, Observer.decimal* observer>() {
+  // Непосредственной формирование  деления. Хотя можно использовать и
+  // функцию для основы
+  // Вычисления упрощены. Можно сделать и более солидную обработку, выделив
+  // все операции в отдельную функцию.
+  int result = 0;
+  int flag = 0;
+  if(subject->@x2 == 0) {
+    if(subject->@x1 == 0) {
+      flag = -1;
+    } else flag = -2;
+  } else {
+    result = subject->@x1 / subject->@x2;
+  }
+
+  // А здесь начинается работа наблюдателя
+  if(flag == 0) {
+    printf("Division->Decimal: %d / %d = %d\n", subject->@x1, subject->@x2, result);
+  } else if(flag == -1) {
+    printf("Division->Decimal: %d / %d = Any value\n", subject->@x1, subject->@x2);
+  } else if(flag == -2) {
+    printf("Division->Decimal: %d / %d = Zero divide situation\n", subject->@x1, subject->@x2);
+  } else {
+    printf("Division->Decimal: %d / %d = An unaccounted-for situation\n", subject->@x1, subject->@x2);
+  }
+}
+
+//------------------------------------------------------------------------------
+// Наблюдатель, использующий вывод с плавающей точкой
+void GetAndUpdate<Subject.div* subject, Observer.dbl* observer>() {
+  // Непосредственной формирование  деления. Хотя можно использовать и
+  // функцию для основы
+  // Вычисления упрощены. Можно сделать и более солидную обработку, выделив
+  // все операции в отдельную функцию.
+  double result = 0.0;
+  int flag = 0;
+  if(subject->@x2 == 0) {
+    if(subject->@x1 == 0) {
+      flag = -1;
+    } else flag = -2;
+  } else {
+    result = (double)subject->@x1 / (double)subject->@x2;
+  }
+
+  // А здесь начинается работа наблюдателя
+  if(flag == 0) {
+    printf("Division->Double: %d / %d = %lf\n", subject->@x1, subject->@x2, result);
+  } else if(flag == -1) {
+    printf("Division->Double: %d / %d = Any value\n", subject->@x1, subject->@x2);
+  } else if(flag == -2) {
+    printf("Division->Double: %d / %d = Zero divide situation\n", subject->@x1, subject->@x2);
+  } else {
+    printf("Division->Double: %d / %d = An unaccounted-for situation\n", subject->@x1, subject->@x2);
+  }
+}
+
+//==============================================================================
+// Дополнительная проверка совместимости субъекта и наблюдателя
+//==============================================================================
+
+// Обобщенная функция, сигнализирующая о несовместимости.
+_Bool isCorrect<Subject* subject, Observer* observer>() {
+  printf("Attach control: Incorrect combination for Attachment\n");
+  PrintSubjectInfo<subject>();
+  PrintObserverInfo<observer>();
+  // exit(13);
+  return 0;
+}
+//------------------------------------------------------------------------------
+// Совместимость для пары Addition->Decimal
+_Bool isCorrect<Subject.add* subject, Observer.decimal* observer>() {
+  printf("Attach control: Correct combination Addition->Decimal for Attachment\n");
+  PrintSubjectInfo<subject>();
+  PrintObserverInfo<observer>();
+  return 1;
+}
+//------------------------------------------------------------------------------
+// Совместимость для пары Addition->Hex
+_Bool isCorrect<Subject.add* subject, Observer.hex* observer>() {
+  printf("Attach control: Correct combination Addition->Неx for Attachment\n");
+  PrintSubjectInfo<subject>();
+  PrintObserverInfo<observer>();
+  return 1;
+}
+//------------------------------------------------------------------------------
+// Совместимость для пары Division->Decimal
+_Bool isCorrect<Subject.div* subject, Observer.decimal* observer>() {
+  printf("Attach control: Correct combination Division->Decimal for Attachment\n");
+  PrintSubjectInfo<subject>();
+  PrintObserverInfo<observer>();
+  return 1;
+}
+//------------------------------------------------------------------------------
+// Совместимость для пары Division->Double
+_Bool isCorrect<Subject.div* subject, Observer.dbl* observer>() {
+  printf("Attach control: Correct combination Division->Doble for Attachment\n");
+  PrintSubjectInfo<subject>();
+  PrintObserverInfo<observer>();
+  return 1;
+}
+//------------------------------------------------------------------------------
+// Подписка субъекта на заданного наблюдателя с предварительной проверкой
+// на допустимость соединени. Если такое соединение недопустимо, то подписка
+// не осуществляется
+void VerifyAndAttach(Subject* subject, Observer *observer) {
+  if(isCorrect<subject, observer>()) {
+    ListPushBack(&(subject->listObserver), observer);
+  }
+  // else {exit(13);}
+}
+
+//==============================================================================
+// Клиентский код, осуществляющий взаимодействие субъектов и наблюдателей
+//==============================================================================
+
+void ClientCode() {
+  // Subject *subject = malloc(sizeof(Subject));
+  Subject.add addSubject;
+  AddSubjectInit(&addSubject);
+  Observer.decimal decimalObserver;
+  Attach(&addSubject, &decimalObserver);
+  Observer.hex hexObserver;
+  Attach(&addSubject, &hexObserver);
+  Observer.dbl dblObserver;
+  Attach(&addSubject, &dblObserver);
+  // Изменение данных и обновление наблюдателей
+  AddSubjectSetAndNotify(&addSubject, 32, 10);
+
+  printf("\n");
+  Detach(&addSubject, &dblObserver);
+  // Раздельное изменение данных и явное обновление наблюдателей
+  AddSubjectSet(&addSubject, 321, 101);
+  NotifyAllObservers((Subject*)&addSubject);
+
+  printf("\n");
+  Subject.div divSubject;
+  DivSubjectInit(&divSubject);
+  Attach(&divSubject, &decimalObserver);
+  // Attach(&divSubject, &hexObserver);
+  VerifyAndAttach(&divSubject, &hexObserver);
+  VerifyAndAttach(&divSubject, &dblObserver);
+  // Изменение данных и обновление наблюдателей
+  DivSubjectSetAndNotify(&divSubject, 32, 10);
+
+  printf("\n");
+  Detach(&divSubject, &hexObserver);
+  // Раздельное изменение данных и явное обновление наблюдателей
+  DivSubjectSet(&divSubject, 234, 567);
+  NotifyAllObservers((Subject*)&divSubject);
+
+  printf("\n");
+  // Изменение данных и обновление наблюдателей
+  DivSubjectSetAndNotify(&divSubject, 0, 0);
+
+  printf("\n");
+  // Изменение данных и обновление наблюдателей
+  DivSubjectSetAndNotify(&divSubject, 10, 0);
+}
+
+int main() {
+  ClientCode();
+  return 0;
+}

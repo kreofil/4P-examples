@@ -1,0 +1,80 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Интерфейс Субъекта объявляет общие операции как для Реального Субъекта, так и
+// для Заместителя. Пока клиент работает с Реальным Субъектом, используя этот
+// интерфейс, вы сможете передать ему заместителя вместо реального субъекта.
+typedef struct Subject {}<> Subject;
+
+void Request<Subject* s>() = 0;
+
+// Реальный Субъект содержит некоторую базовую бизнес-логику. Как правило,
+// Реальные Субъекты способны выполнять некоторую полезную работу, которая к
+// тому же может быть очень медленной или точной – например, коррекция входных
+// данных. Заместитель может решить эти задачи без каких-либо изменений в коде
+// Реального Субъекта.
+typedef struct RealSubject {}<> RealSubject;
+Subject + <RealSubject;>;
+
+void Request<Subject.RealSubject* s>() {
+  printf("RealSubject: Handling request.\n");
+}
+
+// Интерфейс Заместителя идентичен интерфейсу Реального Субъекта.
+typedef struct Proxy {Subject.RealSubject *real_subject;} Proxy;
+Subject + <Proxy;>;
+
+_Bool CheckAccess(Proxy* p) {
+  // Некоторые реальные проверки должны проходить здесь.
+  printf("Proxy: Checking access prior to firing a real request.\n");
+  return 1;
+}
+
+void LogAccess(Proxy* p) {
+  printf("Proxy: Logging the time of request.\n");
+}
+
+// Заместитель хранит ссылку на объект класса РеальныйСубъект. Клиент может
+// либо лениво загрузить его, либо передать Заместителю.
+void ProxyInit(Proxy* p, Subject.RealSubject *real_subject) {
+  p->real_subject = real_subject;
+}
+
+// Наиболее распространёнными областями применения паттерна Заместитель
+// являются ленивая загрузка, кэширование, контроль доступа, ведение журнала и
+// т.д. Заместитель может выполнить одну из этих задач, а затем, в зависимости
+// от результата, передать выполнение одноимённому методу в связанном объекте
+// класса Реального Субъект.
+void Request<struct Subject.Proxy* s>() {
+  if (CheckAccess(&(s->@))) {
+    Request<(Subject*)(s->@real_subject)>();
+    LogAccess(&(s->@));
+  }
+}
+
+// Клиентский код должен работать со всеми объектами (как с реальными, так и
+// заместителями) через интерфейс Субъекта, чтобы поддерживать как реальные
+// субъекты, так и заместителей. В реальной жизни, однако, клиенты в основном
+// работают с реальными субъектами напрямую. В этом случае, для более простой
+// реализации паттерна, можно расширить заместителя из класса реального
+// субъекта.
+void ClientCode(Subject* subject) {
+  // ...
+  Request<subject>();
+  // ...
+}
+
+int main() {
+  printf("Client: Executing the client code with a real subject:\n");
+  struct Subject.RealSubject* real_subject = create_spec(Subject.RealSubject);
+  ClientCode((Subject*)real_subject);
+  printf("\n");
+  printf("Client: Executing the same client code with a proxy:\n");
+  struct Subject.Proxy* proxy = create_spec(Subject.Proxy);
+  ProxyInit(&(proxy->@), real_subject);
+  ClientCode((Subject*)proxy);
+
+  free(real_subject);
+  free(proxy);
+  return 0;
+}

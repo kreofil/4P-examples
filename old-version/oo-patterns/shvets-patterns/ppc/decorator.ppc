@@ -1,0 +1,130 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+//------------------------------------------------------------------------------
+// Базовый интерфейс Компонента определяет поведение, которое изменяется
+// декораторами.
+typedef struct Component {}<> Component;
+void Operation<Component* c>(char* buf) {} //= 0;
+
+// Конкретные Компоненты предоставляют реализации поведения по умолчанию. Может
+// быть несколько вариаций этих классов.
+typedef struct ConcreteComponent {} ConcreteComponent;
+Component + <ConcreteComponent;>;
+
+void Operation<Component.ConcreteComponent* c>(char* buf) {
+    strcpy(buf, "ConcreteComponent");
+}
+
+//------------------------------------------------------------------------------
+// Абстрактный тип Декоратора следует тому же интерфейсу, что и другие типы.
+// Основная его цель  - определить интерфейс обёртки для всех конкретных
+// декораторов. Реализация кода обёртки по умолчанию может включать в себя поле
+// для хранения завёрнутого компонента и средства его инициализации.
+typedef struct Decorator {Component* component;}<> Decorator;
+
+// Функция, обобщающая обработку операции в декораторах
+void DecoratorOperation<Decorator* d>(char* buf) {}
+
+// Связывание декоратора с другим компонентом
+void DecoratorInit(Decorator* d, Component* component) {
+  d->component = component;
+}
+
+// Функция непосредственно перенаправляющая на подключенный компонент
+void DecoratorRedirection(Decorator* d, char* buf) {
+  Operation<d->component>(buf);
+}
+
+Component + <Decorator;>; // Включение декоратора в компонент как подтипа
+
+// Декоратор делегирует всю работу обёрнутому компоненту.
+void Operation<Component.Decorator* c>(char* buf) {
+  Decorator* d = &(c->@);
+  DecoratorOperation<d>(buf);
+}
+
+//------------------------------------------------------------------------------
+// Конкретные Декораторы вызывают обёрнутый объект и изменяют его результат
+// некоторым образом.
+typedef struct ConcreteDecoratorA {} ConcreteDecoratorA;
+Decorator + <ConcreteDecoratorA;>;
+
+// Декораторы могут вызывать родительскую реализацию операции, вместо того,
+// чтобы вызвать обёрнутый объект напрямую. Такой подход упрощает расширение
+// классов декораторов.
+void DecoratorOperation<Decorator.ConcreteDecoratorA* d>(char* buf) {
+  strcpy(buf, "ConcreteDecoratorA(");
+  char tmp_buf[128];
+  tmp_buf[0] = '\0';
+  // Operation<d->component>(tmp_buf);
+  DecoratorRedirection((Decorator*)d, tmp_buf);
+  strcat(buf, tmp_buf);
+  strcat(buf, ")");
+}
+
+//------------------------------------------------------------------------------
+// Декораторы могут выполнять своё поведение до или после вызова обёрнутого
+// объекта.
+typedef struct ConcreteDecoratorB {} ConcreteDecoratorB;
+Decorator + <ConcreteDecoratorB;>;
+
+// Декораторы могут вызывать родительскую реализацию операции, вместо того,
+// чтобы вызвать обёрнутый объект напрямую. Такой подход упрощает расширение
+// классов декораторов.
+void DecoratorOperation<Decorator.ConcreteDecoratorB* d>(char* buf) {
+  strcpy(buf, "ConcreteDecoratorB(");
+  char tmp_buf[128];
+  tmp_buf[0] = '\0';
+  tmp_buf[0] = '\0';
+  // Operation<d->component>(tmp_buf);
+  DecoratorRedirection((Decorator*)d, tmp_buf);
+  strcat(buf, tmp_buf);
+  strcat(buf, ")");
+}
+
+//------------------------------------------------------------------------------
+// Клиентский код работает со всеми объектами, используя интерфейс Компонента.
+// Таким образом, он остаётся независимым от конкретных классов компонентов, с
+// которыми работает.
+void ClientCode(Component* component) {
+  // ...
+  printf("RESULT: ");
+  char buf[256];
+  Operation<component>(buf);
+  printf("%s\n", buf);
+  // ...
+}
+
+//------------------------------------------------------------------------------
+int main() {
+  // Таким образом, клиентский код может поддерживать как простые компоненты...
+  Component* simple = create_spec(Component.ConcreteComponent);
+  printf("Client: I've got a simple component:\n");
+  ClientCode(simple);
+  printf("\n");
+  // ...так и декорированные.
+
+  // Обратите внимание, что декораторы могут обёртывать не только простые
+  // компоненты, но и другие декораторы.
+  struct Component.Decorator* decorator1
+         = create_spec(Component.Decorator.ConcreteDecoratorA);
+  DecoratorInit((Decorator*)&(decorator1->@), simple);
+  printf("Client: I've got a decoratorA-simple component:\n");
+  ClientCode((Component*)decorator1);
+  printf("\n");
+
+  struct Component.Decorator* decorator2
+         = create_spec(Component.Decorator.ConcreteDecoratorB);
+  DecoratorInit((Decorator*)&(decorator2->@), (Component*)decorator1);
+  printf("Client: Now I've got a decoratorB-decoratorA-simple component:\n");
+  ClientCode((Component*)decorator2);
+  printf("\n");
+
+  free(simple);
+  free(decorator1);
+  free(decorator2);
+
+  return 0;
+}

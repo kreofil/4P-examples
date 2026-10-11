@@ -1,0 +1,40 @@
+(*******************************************************************************
+| addFigureCirc.o2m: содержит модуль addFigureCirc с монометодами, вывода 
+| параметров обобщенной окружности и вычислени€ ее перметра 
+*******************************************************************************)
+
+MODULE addFigureCirc;
+IMPORT In, Out, FileIO, figure, circle;
+TYPE
+  (* –асширение обобщени€ добавлением окружности *)
+  figure.fig += circle.circ;
+
+(******************************************************************************)
+
+(*----------------------------------------------------------------------------*)
+(* ¬ычисление периметра обобщенной фигуры *)
+(* ќбработчик специализации дл€ круга *)
+PROCEDURE figure.Perimeter{VAR c: figure.fig<circle.circ>}() : REAL;     
+(*PROCEDURE Perimeter{VAR c: figure.fig<circle.circ>}() : REAL;*)
+BEGIN 
+  RETURN circle.Perimeter(c)     
+END Perimeter;
+
+(*----------------------------------------------------------------------------*)
+(* ¬ывод обобщенной окружности *)
+PROCEDURE figure.Output {VAR c: figure.fig<circle.circ>};
+(*PROCEDURE Output {VAR c: figure.fig<circle.circ>};*)
+BEGIN
+  circle.Output(c)
+END Output;
+
+(*----------------------------------------------------------------------------*)
+(* ќбрабоотчик специализации дл€ окружности *)
+PROCEDURE figure.FileOutput
+           {VAR c: figure.fig<circle.circ>}(VAR outFile : FileIO.TFile);     
+BEGIN 
+  circle.FileOutput(outFile, c)    
+END FileOutput;
+
+(*============================================================================*)
+END addFigureCirc.

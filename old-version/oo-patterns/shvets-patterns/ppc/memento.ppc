@@ -1,0 +1,195 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+
+
+// Интерфейс Снимка предоставляет способ извлечения метаданных снимка, таких как
+// дата создания или название. Однако он не раскрывает состояние Создателя.
+typedef struct Memento {}<> Memento;
+
+char* GetName<Memento* m>(char* str) {return NULL;} //= 0;
+char* Date<Memento* m>() {return NULL;} //= 0;
+char* State<Memento* m>() {return NULL;} //= 0;
+
+// Конкретный снимок содержит инфраструктуру для хранения состояния Создателя.
+typedef struct ConcreteMemento {
+  char state[256];
+  char date[256];
+} ConcreteMemento;
+Memento + <ConcreteMemento;>;
+
+void ConcreteMementoSet(ConcreteMemento* cm, char* state) {
+  strcpy(cm->state, state);
+  time_t now = time(0);
+  strcpy(cm->date, ctime(&now));
+}
+
+// Создатель использует этот метод, когда восстанавливает своё состояние.
+char* State<Memento.ConcreteMemento* m>() {
+  return m->@state;
+}
+
+// Своя функци substr. Кривая...
+void substr(char* in, char* out, int first, int last) {
+  out[0] = '\0';
+  if(first > last) {
+    return;
+  }
+  int iOut = 0;
+  for(int i = first; i < last; ++i) {
+    out[iOut++] = in[i];
+    if(in[i] == '\0') return;
+  }
+  out[iOut] = '\0';
+}
+
+// Остальные методы используются Опекуном для отображения метаданных.
+char* GetName<Memento.ConcreteMemento* m>(char* str)  {
+  // this->date_ + " / (" + this->state_.substr(0, 9) + "...)";
+  char tmp[20];
+  tmp[0] = '\0';
+  strcpy(str, m->@date);
+  strcat(str, " / (");
+  substr(m->@state, tmp, 0, 9);
+  strcat(str, tmp);
+  strcat(str, "...)");
+  return str;
+}
+
+char* Date<Memento.ConcreteMemento* m>() {
+  return m->@date;
+}
+
+// Создатель содержит некоторое важное состояние, которое может со временем
+// меняться. Он также объявляет метод сохранения состояния внутри снимка и метод
+// восстановления состояния из него.
+typedef struct Originator {
+  char state[256];
+} Originator;
+
+char* GenerateRandomString(char* randomString, int length) {
+  const char alphanum[] = "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+  int stringLength = sizeof(alphanum) - 1;
+
+  randomString[0] = '\0';
+  for (int i = 0; i < length; i++) {
+    randomString[i] = alphanum[rand() % stringLength];
+  }
+  randomString[length] = '\0';
+  return randomString;
+}
+
+void OriginatorInitState(Originator* or, char* state) {
+  strcpy(or->state, state);
+  printf("Originator: My initial state is: %s\n", or->state);
+}
+
+void OriginatorSetState(Originator* or, char* state) {
+  strcpy(or->state, state);
+  // printf("Originator: My initial state is: %s\n", or->state);
+}
+
+// Бизнес-логика Создателя может повлиять на его внутреннее состояние. Поэтому
+// клиент должен выполнить резервное копирование состояния с помощью метода
+// save перед запуском методов бизнес-логики.
+void DoSomething(Originator* or) {
+  printf("Originator: I'm doing something important.\n");
+  char randomString[256];
+  GenerateRandomString(randomString, 30);
+  strcpy(or->state, randomString);
+  printf("Originator: and my state has changed to: %s\n", or->state);
+}
+
+// Сохраняет текущее состояние внутри снимка.
+Memento *Save(Originator* or) {
+  struct Memento.ConcreteMemento* m = create_spec(Memento.ConcreteMemento);
+  ConcreteMementoSet(&(m->@), or->state);
+  return (Memento*)m;
+}
+
+// Восстанавливает состояние Создателя из объекта снимка.
+void Restore(Originator* or, Memento *memento) {
+  OriginatorSetState(or, State<memento>());
+  printf("Originator: My state has changed to: %s\n", or->state);
+}
+
+// Опекун не зависит от класса Конкретного Снимка. Таким образом, он не имеет
+// доступа к состоянию создателя, хранящемуся внутри снимка. Он работает со
+// всеми снимками через базовый интерфейс Снимка.
+typedef struct Caretaker {
+  int memSize;
+  Memento*mementos[10];
+  Originator *originator;
+} Caretaker;
+
+
+void CaretakerSetOriginator(Caretaker* c, Originator* originator) {
+  c->originator = originator;
+}
+
+void CaretakerInit(Caretaker* c, Originator* originator) {
+  c->memSize = 0;
+  c->originator = originator;
+}
+
+void CaretakerClear(Caretaker* c) {
+  for (int i = 0; i < c->memSize; ++i) {
+    free(c->mementos[i]);
+  }
+  c->memSize = 0;
+}
+
+void Backup(Caretaker* c) {
+  printf("\nCaretaker: Saving Originator's state...\n");
+  c->mementos[c->memSize++] = Save(c->originator);
+}
+
+void Undo(Caretaker* c) {
+  if (!c->memSize) {
+    return;
+  }
+  Memento *memento = c->mementos[c->memSize-1];
+  char name[256];
+  GetName<memento>(name);
+  printf("Caretaker: Restoring state to: %s\n", name);
+  Restore(c->originator, memento);
+  free(c->mementos[c->memSize-1]);
+  c->memSize--;
+}
+
+void ShowHistory(Caretaker* c) {
+  printf("Caretaker: Here's the list of mementos:\n");
+  for(int i = 0; i < c->memSize; ++i) {
+    char name[256];
+    printf("%s\n", GetName<c->mementos[i]>(name));
+  }
+}
+
+// Клиентский код.
+void ClientCode() {
+  Originator originator;
+  OriginatorInitState(&originator, "Super-duper-super-puper-super.");
+  Caretaker caretaker;
+  CaretakerInit(&caretaker, &originator);
+  Backup(&caretaker);
+  DoSomething(&originator);
+  Backup(&caretaker);
+  DoSomething(&originator);
+  Backup(&caretaker);
+  DoSomething(&originator);
+  printf("\n");
+  ShowHistory(&caretaker);
+  printf("\nClient: Now, let's rollback!\n\n");
+  Undo(&caretaker);
+  printf("\nClient: Once more!\n\n");
+  Undo(&caretaker);
+}
+
+int main() {
+  srand(time(NULL));
+  ClientCode();
+  return 0;
+}

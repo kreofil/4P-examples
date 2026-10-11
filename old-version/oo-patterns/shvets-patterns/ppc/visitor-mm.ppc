@@ -1,0 +1,80 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+// Посетителя можно реализовать как мультиметод
+
+typedef struct ConcreteComponentA {} ConcreteComponentA;
+// Функция, выполняемая конкретным компонентом A
+char* ExclusiveMethodOfConcreteComponentA(ConcreteComponentA* с) {
+  return "A";
+}
+typedef struct ConcreteComponentB {} ConcreteComponentB;
+// Функция, выполняемая конкретным компонентом B
+char* SpecialMethodOfConcreteComponentB(ConcreteComponentB* с) {
+  return "B";
+}
+
+typedef struct Component {}<> Component;
+Component + <ConcreteComponentA;>;
+Component + <ConcreteComponentB;>;
+
+typedef struct Visitor {}<> Visitor;
+// Посетитель и компонент образуют мультиметод
+void VisitComponent<Visitor* v, Component *с>() = 0;
+
+Visitor + <ConcreteVisitor1: void;>;
+Visitor + <ConcreteVisitor2: void;>;
+
+void VisitComponent
+      <Visitor.ConcreteVisitor1* v, Component.ConcreteComponentA *c>() {
+  char* str = ExclusiveMethodOfConcreteComponentA(&(c->@));
+  printf("%s + ConcreteVisitor1\n", str);
+}
+void VisitComponent
+      <Visitor.ConcreteVisitor1* v, Component.ConcreteComponentB *c>() {
+  char* str = SpecialMethodOfConcreteComponentB(&(c->@));
+  printf("%s + ConcreteVisitor1\n", str);
+}
+
+void VisitComponent
+      <Visitor.ConcreteVisitor2* v, Component.ConcreteComponentA *c>() {
+  char* str = ExclusiveMethodOfConcreteComponentA(&(c->@));
+  printf("%s + ConcreteVisitor2\n", str);
+}
+void VisitComponent<Visitor.ConcreteVisitor2* v, Component.ConcreteComponentB *c>() {
+  char* str = SpecialMethodOfConcreteComponentB(&(c->@));
+  printf("%s + ConcreteVisitor2\n", str);
+}
+
+// Клиентский код может выполнять операции посетителя над любым набором
+// элементов, не выясняя их конкретных классов. Операция принятия направляет
+// вызов к соответствующей операции в объекте посетителя.
+void ClientCode(Component* components[], int len, Visitor *visitor) {
+  // ...
+  for (int i = 0; i < len; i++) {
+    VisitComponent<visitor, components[i]>();
+  }
+  // ...
+}
+
+int main() {
+  Component* components[2];
+  components[0] = create_spec(Component.ConcreteComponentA);
+  components[1] = create_spec(Component.ConcreteComponentB);
+  printf("The client code works with all visitors via the base Visitor interface:\n");
+  Visitor* visitor1 = create_spec(Visitor.ConcreteVisitor1);
+  ClientCode(components, 2, visitor1);
+  printf("\n");
+  printf("It allows the same client code to work with different types of visitors:\n");
+  Visitor* visitor2 = create_spec(Visitor.ConcreteVisitor2);
+  ClientCode(components, 2, visitor2);
+
+  for (int i = 0; i < 2; i++) {
+    free(components[i]);
+  }
+  free(visitor1);
+  free(visitor2);
+
+  return 0;
+}

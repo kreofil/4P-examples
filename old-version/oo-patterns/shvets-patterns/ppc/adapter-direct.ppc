@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+// Целевой класс объявляет интерфейс, с которым может работать клиентский код.
+typedef struct Target {}<> Target;
+
+void Request<Target* t>(char* str){
+    strcpy(str, "Target: The default target's behavior.");
+}
+
+// Адаптируемый класс содержит некоторое полезное поведение, но его интерфейс
+// несовместим с существующим клиентским кодом. Адаптируемый класс нуждается в
+// некоторой доработке, прежде чем клиентский код сможет его использовать.
+typedef struct Adaptee {} Adaptee;
+
+char* SpecificRequest(Adaptee* a) {
+    return ".eetpadA eht fo roivaheb laicepS";
+}
+
+// В ППП в принцип не нужна дополнительная прокладка в качестве адаптера
+// Можно Adaptee сделать специализацией Target
+// Если Adaptee не допускает прямого использования, то можно реализовать через
+// указатель
+Target + <Adaptee;>;
+
+// Дополнительная функция, осуществляющая реверс строки
+void Reverse(char* str) {
+    int len = strlen(str);
+    for(int i = 0, j = len-1; i < j; ++i, --j) {
+        char ch = str[i];
+        str[i] = str[j];
+        str[j] = ch;
+    }
+}
+
+void Request<Target.Adaptee* t>(char* str) {
+    char to_reverse[256];
+    to_reverse[0] = '\0';
+    strcpy(to_reverse, SpecificRequest(&(t->@)));
+    Reverse(to_reverse);
+    strcpy(str, "Adapter(Adaptee): (TRANSLATED) ");
+    strcat(str, to_reverse);
+}
+
+// Клиентский код поддерживает все классы, использующие целевой интерфейс.
+void ClientCode(Target *target) {
+    char str[256];
+    Request<target>(str);
+    printf("%s", str);
+}
+
+int main() {
+    printf("Client: I can work just fine with the Target objects:\n");
+    Target *target = create_spec(Target);
+    ClientCode(target);
+    printf("\n\n");
+    Adaptee *adaptee = malloc(sizeof(Adaptee));
+    printf("Client: The Adaptee class has a weird interface. "
+    "See, I don't understand it:\n");
+    printf("Adaptee: %s", SpecificRequest(adaptee));
+    printf("\n\n");
+    printf("Client: But I can work with it via the Adapter(Adaptee):\n");
+    struct Target.Adaptee *adapter = create_spec(Target.Adaptee);
+    ClientCode((Target*)adapter);
+    printf("\n");
+
+    free(target);
+    free(adaptee);
+    free(adapter);
+
+    return 0;
+}

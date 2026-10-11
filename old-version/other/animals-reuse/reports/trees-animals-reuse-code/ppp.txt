@@ -1,0 +1,32 @@
+.
+├── 01-start
+│   ├── animals.ppc
+│   ├── animals.pph
+│   └── main.ppc
+├── 02-swimming-dog
+│   ├── main.ppc
+│   ├── swimming-dog.ppc
+│   └── swimming-dog.pph
+├── 03-diving-penguin
+│   ├── diving.ppc
+│   ├── diving.pph
+│   └── main.ppc
+├── 04-eating
+│   ├── eating.ppc
+│   ├── eating.pph
+│   └── main.ppc
+├── 05-groups
+│   ├── groups.ppc
+│   ├── groups.pph
+│   └── main.ppc
+├── 06-multimethod
+│   ├── main.ppc
+│   ├── multimethod.ppc
+│   └── multimethod.pph
+├── 07-mosquito
+│   ├── main.ppc
+│   ├── mosquito.ppc
+│   └── mosquito.pph
+└── ppp.txt
+
+8 directories, 22 files

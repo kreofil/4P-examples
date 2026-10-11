@@ -1,0 +1,9 @@
+Filled container.
+Container contents 5 elements.
+0: It is Coord Rectangle: top left = (3,4), down right = (2,1)
+1: It is Coord Rectangle: top left = (1,1), down right = (30,40)
+2: It is Coord Triangle: a = (2.75,2.43), b = (1.13,1), c = (13,14)
+3: It is Coord Triangle: a = (10,10), b = (10,1), c = (330,49)
+4: It is Coord Triangle: a = (3,4), b = (5,0), c = (0,0)
+Empty container.
+Container contents 0 elements.

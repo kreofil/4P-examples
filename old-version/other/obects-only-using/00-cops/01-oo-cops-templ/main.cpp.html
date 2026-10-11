@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="Generator" content="Kate, the KDE Advanced Text Editor" />
+<title>main.cpp</title>
+</head>
+<!-- Highlighting: "C++" -->
+<body>
+<pre style='color:#f8f8f2;background-color:#272822;'>
+  <span style='color:#75715e;'>// ОО версия программы про хорошего и плохого полицейских,</span>
+  <span style='color:#75715e;'>// использующая ОО (динамический) полиморфизм</span>
+  <span style='color:#f92672;'>#include </span><span style='color:#e6db74;'>&lt;stdio.h&gt;</span>
+
+  <span style='color:#f92672;'>struct</span> BadCop { <i><span style='color:#66d9ef;'>void</span></i> Action() {
+    printf(<span style='color:#e6db74;'>&quot;Бац-бац...</span><span style='color:#ae81ff;'>\n</span><span style='color:#e6db74;'>&quot;</span>); }
+  };
+
+  <span style='color:#f92672;'>struct</span> GoodCop {
+    <i><span style='color:#66d9ef;'>void</span></i> Action() { printf(<span style='color:#e6db74;'>&quot;Именем закона...</span><span style='color:#ae81ff;'>\n</span><span style='color:#e6db74;'>&quot;</span>); }
+  };
+
+  <span style='color:#f92672;'>struct</span> UnknownCop { <i><span style='color:#66d9ef;'>void</span></i> Action() {
+    printf(<span style='color:#e6db74;'>&quot;Непонятно, какой полицейский.</span><span style='color:#ae81ff;'>\n</span><span style='color:#e6db74;'>&quot;</span>); }
+  };
+
+  <span style='color:#f92672;'>template</span>&lt;<span style='color:#f92672;'>typename</span> T = UnknownCop&gt; <i><span style='color:#66d9ef;'>void</span></i> Action() {
+    T cop;
+    cop.Action();
+  }
+
+  <i><span style='color:#66d9ef;'>int</span></i> main() {
+    Action&lt;BadCop&gt;();
+    <span style='color:#75715e;'>// Action&lt;GoodCop&gt;();</span>
+    <span style='color:#75715e;'>// Action&lt;UnknownCop&gt;();</span>
+    <span style='color:#75715e;'>// Action();</span>
+
+    <span style='color:#f92672;'>return</span> <span style='color:#ae81ff;'>0</span>;
+  }
+</pre>
+</body>
+</html>

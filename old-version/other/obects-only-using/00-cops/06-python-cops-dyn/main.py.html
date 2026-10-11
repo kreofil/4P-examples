@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="Generator" content="Kate, the KDE Advanced Text Editor" />
+<title>main.py</title>
+</head>
+<!-- Highlighting: "Python" -->
+<body>
+<pre style='color:#f8f8f2;background-color:#272822;'>
+<span style='color:#75715e;'># Версия программы про хорошего и плохого полицейских, использующая</span>
+<span style='color:#75715e;'># ОО (динамический) полиморфизм и написанная на Python с применением</span>
+<span style='color:#75715e;'># независимых друг от друга объектов</span>
+
+<span style='color:#f92672;'>class</span> Cop: <span style='color:#75715e;'># Обобщенный (иной) полицейский</span>
+  <span style='color:#f92672;'>def</span> Action(self):
+    <span style='color:#66d9ef;'>print</span>(<span style='color:#e6db74;'>&quot;</span><span style='color:#e6db74;'>Непонятно, какой полицейский.</span><span style='color:#e6db74;'>&quot;</span>)
+
+<span style='color:#f92672;'>class</span> BadCop: <span style='color:#75715e;'># Плохой полицейский</span>
+  <span style='color:#f92672;'>def</span> Action(self):
+    <span style='color:#66d9ef;'>print</span>(<span style='color:#e6db74;'>&quot;</span><span style='color:#e6db74;'>Бац-бац...</span><span style='color:#e6db74;'>&quot;</span>);
+
+<span style='color:#f92672;'>class</span> GoodCop: <span style='color:#75715e;'># Хороший полицейский</span>
+  <span style='color:#f92672;'>def</span> Action(self):
+    <span style='color:#66d9ef;'>print</span>(<span style='color:#e6db74;'>&quot;</span><span style='color:#e6db74;'>Именем закона...</span><span style='color:#e6db74;'>&quot;</span>);
+
+<span style='color:#75715e;'>#----------------------------------------------</span>
+<span style='color:#f92672;'>if</span> __name__ == <span style='color:#e6db74;'>'</span><span style='color:#e6db74;'>__main__</span><span style='color:#e6db74;'>'</span>:
+  tag = <span style='color:#66d9ef;'>int</span>(<span style='color:#66d9ef;'>input</span>(<span style='color:#e6db74;'>&quot;</span><span style='color:#e6db74;'>Какой полицейский? (0 - плохой, 1 - хороший): </span><span style='color:#e6db74;'>&quot;</span>))
+
+  <span style='color:#f92672;'>if</span> tag == <span style='color:#ae81ff;'>0</span>:
+    cop = BadCop()   <span style='color:#75715e;'># плохой</span>
+  <span style='color:#f92672;'>elif</span> tag == <span style='color:#ae81ff;'>1</span>:
+    cop = GoodCop()  <span style='color:#75715e;'># хороший</span>
+  <span style='color:#f92672;'>else</span>:
+    cop = Cop()      <span style='color:#75715e;'># иной</span>
+
+  cop.Action()
+</pre>
+</body>
+</html>

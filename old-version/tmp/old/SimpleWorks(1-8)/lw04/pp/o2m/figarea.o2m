@@ -1,0 +1,86 @@
+(*******************************************************************************
+| figarea.o: содержит модуль figarea с процедурами, осуществляющими 
+| вывод площадей обощенной фигуры.
+*******************************************************************************)
+
+MODULE figarea; 
+IMPORT In, Out, FileIO, figure, rectangle, triangle, rectarea, trianarea;
+
+(******************************************************************************)
+(* Процедура, вычисляющая площадь обобщенной фигуры *)
+PROCEDURE Area*(VAR f: figure.fig) : REAL;     
+VAR
+  p : REAL;
+BEGIN 
+  WITH f: rectangle.rect DO p := rectarea.Area(f)
+     | f: triangle.trian DO p := trianarea.Area(f)
+  ELSE p := 0
+  END;  
+  RETURN p     
+END Area;
+
+(* Заполнение добавленного поля площади обобщенной фигуры *)
+PROCEDURE SetArea*(VAR f: figure.fig);     
+VAR
+  p : REAL;
+BEGIN  
+  f.ar := Area(f);
+END SetArea;
+                 
+(******************************************************************************)
+(* Процедура Заполнения фигуры из файла *)
+PROCEDURE FileInput*(VAR inFile : FileIO.TFile) : figure.Pfig;
+VAR
+  flag : INTEGER;
+  tag : INTEGER;
+  pf : figure.Pfig;
+  pr : rectangle.Prect;
+  pt : triangle.Ptrian;
+BEGIN     
+  flag := inFile.ReadInt(tag); 
+
+  IF tag = 1 THEN 
+    NEW(pr); rectangle.FileInput(inFile, pr^); pf := pr; 
+  ELSIF tag = 2 THEN 
+    NEW(pt); triangle.FileInput(inFile, pt^);  pf := pt;  
+  ELSE                                    
+    RETURN NIL;
+  END;
+  SetArea(pf^);
+  RETURN pf
+
+END FileInput; 
+
+(******************************************************************************)
+(* Процедура вывода на консоль обобщенной фигуры *)
+
+PROCEDURE Output*(VAR f: figure.fig);
+BEGIN 
+  WITH f: rectangle.rect DO rectangle.Output(f)
+     | f: triangle.trian   DO triangle.Output(f)
+  ELSE Out.String("Invalid figure"); Out.Ln; RETURN
+  END;
+  Out.String(",   area = "); 
+  Out.Real(f.ar, 7); 
+  Out.Ln();
+END Output;
+
+(******************************************************************************)
+(* Процедура вывода в файл обобщенной фигуры *)
+PROCEDURE FileOutput*(VAR outFile : FileIO.TFile; VAR f: figure.fig);
+VAR 
+  flag : INTEGER;
+BEGIN     
+  WITH f: rectangle.rect DO rectangle.FileOutput(outFile, f)
+     | f: triangle.trian DO triangle.FileOutput(outFile, f)
+  ELSE
+    flag := outFile.WriteString("Invalid figure");
+    flag := outFile.Ln();
+    RETURN;
+  END;
+  flag := outFile.WriteString(",   area = "); 
+  flag := outFile.WriteReal(f.ar, 7); 
+  flag := outFile.Ln();
+END FileOutput;
+
+END figarea.

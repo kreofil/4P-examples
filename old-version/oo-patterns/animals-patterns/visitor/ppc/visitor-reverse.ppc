@@ -1,0 +1,85 @@
+// Компилировать: ppclang -xc visitor-reverse.ppc -o visitor-reverse
+#include <stdio.h>
+
+// Утка
+typedef struct Duck {} Duck;
+// Информация об утке
+char* AboutDuck(Duck* a) {
+  return "It is the Duck.";
+}
+
+// Собака
+typedef struct Dog {} Dog;
+// Информация об утке
+char* AboutDog(Dog* a) {
+  return "It is the Dog.";
+}
+
+// Обобщение для животных.
+typedef struct Animal {}<> Animal;
+//  Специализации животных
+Animal + <Duck;>;
+Animal + <Dog;>;
+// Обобщенная инициализация животных (пока пустая)
+void Init<Animal* a>() = 0;
+// Специализированные инициализаторы
+void Init<Animal.Duck* a>() {
+  printf("Duck created!\n");
+}
+void Init<Animal.Dog* a>() {
+  printf("Dog created!\n");
+}
+
+// Обобщенный посетитель
+typedef struct Visitor {}<> Visitor;
+// Специализации посетителя
+Visitor + <Feed: void;>;
+Visitor + <Swim: void;>;
+
+// Обобщающие функции Посетителя
+// Посещение еды
+void VisitFeed<Animal* a>() = 0;
+// Обработчики специализаций посетителя
+void VisitFeed<Animal.Duck* a>() {
+  printf("%s It eats grain\n", AboutDuck(&(a->@)));
+}
+void VisitFeed<Animal.Dog* a>() {
+  printf("%s It eats meat\n", AboutDog(&(a->@)));
+}
+// Посещение плавания
+void VisitSwim<Animal* a>() = 0;
+// Обработчики специализаций посетителя
+void VisitSwim<Animal.Duck* a>() {
+  printf("%s It is very good swimmer.\n", AboutDuck(&(a->@)));
+}
+void VisitSwim<Animal.Dog* a>() {
+  printf("%s  It is not a good swimmer.\n", AboutDog(&(a->@)));
+}
+
+// Обобщающая функция для запуска реверсивной диспетчеризации
+void ReverseAccept<Visitor *visitor>(Animal* animal) = 0;
+// Обработчики специализаций
+void ReverseAccept<Visitor.Feed *visitor>(Animal* animal) {
+  VisitFeed<animal>();
+}
+void ReverseAccept<Visitor.Swim *visitor>(Animal* animal) {
+  VisitSwim<animal>();
+}
+
+// Клиентский код может выполнять операции посетителя над любым набором.
+void Client(Animal* animal, Visitor *visitor) {
+    ReverseAccept<visitor>(animal);
+}
+
+int main() {
+  struct Animal.Duck duck; Init<(Animal*)&duck>();
+  struct Animal.Dog dog;   Init<(Animal*)&dog>();
+  struct Visitor.Feed feeding;
+  struct Visitor.Swim swimming;
+  Client((Animal*)&duck, (Visitor*)&feeding);
+  Client((Animal*)&dog, (Visitor*)&feeding);
+  Client((Animal*)&duck, (Visitor*)&swimming);
+  Client((Animal*)&dog, (Visitor*)&swimming);
+
+  return 0;
+}

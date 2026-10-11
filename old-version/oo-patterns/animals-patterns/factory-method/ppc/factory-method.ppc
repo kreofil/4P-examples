@@ -1,0 +1,87 @@
+// Компилировать: ppclang -xc factory-method.ppc -o factory-method
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+// Обобщение для животных.
+typedef struct Animal {}<> Animal;
+
+// Конкретные животные. Могут в будущем иметь специализации...
+typedef struct Duck {}<> Duck;
+Animal + <Duck;>;
+typedef struct Dog {}<> Dog;
+Animal + <Dog;>;
+
+// Эволюционно расширяемый перечислимый тип, обеспечивающий полиморфный выбор
+// функции создания продукта.
+typedef struct Creator {}<> Creator;
+// Создатель может также обеспечить реализацию фабричного метода по умолчанию.
+Animal* FactoryMethod<Creator* c>() {return NULL;} // = 0;
+
+// Обязанность Создателя не заключается в создании продуктов.
+// Обычно он содержит некоторую базовую бизнес-логику, которая основана на объектах Продуктов, возвращаемых фабричным методом.
+Animal* NewAnimal(Creator* c) {
+  // Вызываем фабричный метод, чтобы получить объект-продукт.
+  Animal* animal = FactoryMethod<c>();
+  return animal;
+}
+
+// Конкретные Создатели переопределяют фабричный метод для того, чтобы задать
+// вид животного.
+typedef struct DuckCreator {} DuckCreator;
+Creator + <DuckCreator;>;
+// Сигнатура метода по-прежнему использует тип обобщенного животного,
+// хотя фактически из функции возвращается конкретное животное.
+// Создатель независит от конкретных видов животных.
+Animal* FactoryMethod<Creator.DuckCreator* p>() {
+  printf("Duck created!\n");
+  return create_spec(Animal.Duck);
+}
+typedef struct DogCreator {} DogCreator;
+Creator + <DogCreator;>;
+Animal* FactoryMethod<Creator.DogCreator* p>() {
+  printf("Dog created\n");
+  return create_spec(Animal.Dog);
+}
+
+// Клиентский код работает с экземпляром конкретного создателя через его
+// базовый интерфейс. Пока клиент продолжает работать с создателем можно
+// передать ему любую специализацию.
+void ClientCode(Creator* creator) {
+  // ...
+  printf(
+    "Client: I'm not aware of the creator's specialization, "
+    "but it still works.\n");
+  Animal* animal = NewAnimal(creator);
+  // Любые операции с Продуктом, если для него есть дополнительные функции.
+  // ...
+  free(animal);
+}
+
+// Приложение выбирает тип создателя в зависимости от конфигурации или среды.
+int main() {
+  // Использование динамического выделения памяти
+  printf("Step 1: Launched with the DuckCreator.\n");
+  Creator* creator1 = create_spec(Creator.DuckCreator);
+  ClientCode(creator1);
+  free(creator1);
+
+  printf("\n");
+  printf("Step 2: Launched with the DogCreator.\n");
+  Creator* creator2 = create_spec(Creator.DogCreator);
+  ClientCode(creator2);
+  free(creator2);
+
+  // Использование автоматического выделения памяти
+  printf("\n");
+  printf("Step 3: Launched with the DuckCreator.\n");
+  struct Creator.DuckCreator creator3;
+  ClientCode((Creator*)&creator3);
+
+  printf("\n");
+  printf("Step 4: Launched with the DogCreator.\n");
+  struct Creator.DogCreator creator4;
+  ClientCode((Creator*)&creator4);
+
+  return 0;
+}

@@ -1,0 +1,57 @@
+# python
+
+## simple-string
+
+Delta time =  5.2489519119262695
+Delta time =  5.281668186187744
+Delta time =  5.256367206573486
+Delta time =  5.3000428676605225
+Delta time =  5.2338032722473145
+
+## simple-string
+Delta time =  5.362146615982056
+Delta time =  5.443512678146362
+Delta time =  5.344646453857422
+Delta time =  5.432584285736084
+Delta time =  5.329887628555298
+
+## inheritance
+
+Delta time =  4.474185943603516
+Delta time =  4.412752628326416
+Delta time =  4.4937968254089355
+Delta time =  4.43683648109436
+Delta time =  4.487177848815918
+
+## duck-typing
+
+Delta time =  4.625168085098267
+Delta time =  4.4816625118255615
+Delta time =  4.423711061477661
+Delta time =  4.404829502105713
+Delta time =  4.46296763420105
+
+# C++, C, PPC
+
+## C++
+
+Delta time = 0.204171
+Delta time = 0.190836
+Delta time = 0.206661
+Delta time = 0.190798
+Delta time = 0.191532
+
+## PPC
+Delta time = 0.231999
+Delta time = 0.247348
+Delta time = 0.237997
+Delta time = 0.225760
+Delta time = 0.232623
+
+## C
+
+Delta time = 0.232765
+Delta time = 0.220421
+Delta time = 0.216268
+Delta time = 0.223799
+Delta time = 0.225378

@@ -1,0 +1,30 @@
+# Intermediate files
+*.aux
+*.log
+*.out
+*.gz
+*.toc
+*.zip
+*.bak
+*.cmake
+
+# User-specific stuff
+**/.vscode/**
+**/.idea/**
+**/.kdev4/**
+**/cmake-build-debug/**
+**/CMakeFiles/**
+**/build/**
+**/bin/**
+**/lib/**
+**/.cache/**
+!**/build/.gitkeep
+**/src/result/**
+
+CMakeCache.txt
+CMakeLists.txt.user
+Makefile
+Makefile2
+project.kdev4
+
+**/export

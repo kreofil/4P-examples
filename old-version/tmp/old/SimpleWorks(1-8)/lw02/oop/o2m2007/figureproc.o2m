@@ -1,0 +1,64 @@
+(*******************************************************************************
+| figureproc.o: содержит модуль figureProc с процедурами, осуществляющими 
+| обработку специализаций, связанных с обобщенной геометрической фигурой.
+| Эти процедуры лучше разместить после того, как будут созданы специализации,
+| т.к. их структуру необходимо знать во время обработки.
+*******************************************************************************)
+
+MODULE figureProc; 
+IMPORT In, Out, FileIO, figure, rectangle, triangle, circle;
+
+(******************************************************************************)
+(* Процедура, осуществляющая создание и ввод одной из специализаций  *)
+(* после предварительного анализа признака вводимой фигуры *)
+PROCEDURE Input*() : figure.Pfig;
+VAR
+  tag : INTEGER;
+  pf : figure.Pfig;
+  pr : rectangle.Prect;
+  pt : triangle.Ptrian;
+  pc : circle.Pcirc;
+BEGIN 
+  Out.String("Input figure tag (1 - rectangle; 2 - triangle; 3- circle; else - NIL): "); 
+  Out.Ln; 
+  In.Int(tag);
+  IF tag = 1 THEN 
+    NEW(pr); pr.Input; pf := pr;
+  ELSIF tag = 2 THEN 
+    NEW(pt); pt.Input; pf := pt;
+  ELSIF tag = 3 THEN 
+    NEW(pc); pc.Input; pf := pc;
+  ELSE                                    
+    pf := NIL;
+  END;
+  RETURN pf    
+
+END Input;
+
+(******************************************************************************)
+(* Процедура заполнения обобщенной фигуры из файла *)
+PROCEDURE FileInput*(VAR inFile : FileIO.TFile) : figure.Pfig;
+VAR
+  flag : INTEGER;
+  tag : INTEGER;
+  pf : figure.Pfig;
+  pr : rectangle.Prect;
+  pt : triangle.Ptrian;
+  pc : circle.Pcirc;
+BEGIN     
+  flag := inFile.ReadInt(tag); 
+
+  IF tag = 1 THEN 
+    NEW(pr); pr.FileInput(inFile); pf := pr;
+  ELSIF tag = 2 THEN 
+    NEW(pt); pt.FileInput(inFile); pf := pt;
+  ELSIF tag = 3 THEN 
+    NEW(pc); pc.FileInput(inFile); pf := pc;
+  ELSE                                    
+    pf := NIL;
+  END;
+  RETURN pf
+
+END FileInput; 
+
+END figureProc.

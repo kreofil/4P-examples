@@ -1,0 +1,162 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+struct UnoderedMap;
+
+// Паттерн Прототип
+//
+// Назначение: Позволяет копировать объекты, не вдаваясь в подробности их
+// реализации.
+
+typedef enum Type {
+  PROTOTYPE_1 = 0,
+  PROTOTYPE_2
+} Type;
+
+// Пример класса, имеющего возможность клонирования. Мы посмотрим как происходит
+// клонирование значений полей разных типов.
+typedef struct Prototype {
+  char prototypeName[256];
+  float prototypeField;
+}<> Prototype;
+
+void PrototypeSetName(Prototype* p, char* prototypeName) {
+  strcpy(p->prototypeName, prototypeName);
+}
+
+Prototype* Clone<Prototype* p>() {
+  perror("It is Abstract prototype!!!\n");
+  exit(13);
+  //return NULL;
+} //= 0;
+
+void Method<Prototype* p>(float prototypeField) {
+  p->prototypeField = prototypeField;
+  printf("Call Method from %s with field : %f\n",
+         p->prototypeName, p->prototypeField);
+}
+
+// Вывод информации о прототипе
+void PrototypePrint<Prototype* p>() = 0;
+
+// ConcretePrototype1 is a Sub-Class of Prototype and implement the Clone Method
+// In this example all data members of Prototype Class are in the Stack. If you
+// have pointers in your properties for ex: String* name_ ,you will need to
+// implement the Copy-Constructor to make sure you have a deep copy from the
+// clone method
+typedef struct ConcretePrototype1 {
+  float concretePrototypeField1;
+} ConcretePrototype1;
+Prototype + <ConcretePrototype1;>;
+
+void ConcretePrototype1Set(struct Prototype.ConcretePrototype1* p,
+                           char* prototypeName,
+                           float concretePrototypeField) {
+  PrototypeSetName((Prototype*)p, prototypeName);
+  p->@concretePrototypeField1 = concretePrototypeField;
+}
+
+// Notice that Clone method return a Pointer to a new ConcretePrototype1
+// replica. so, the client (who call the clone method) has the responsability
+// to free that memory. If you have smart pointer knowledge you may prefer to
+// use unique_pointer here.
+Prototype* Clone<Prototype.ConcretePrototype1* p>() {
+  struct Prototype.ConcretePrototype1* tmp =
+                  create_spec(Prototype.ConcretePrototype1);
+  // Копирующего конструктора нет. Поэтому приходится явно
+  ConcretePrototype1Set(tmp, p->prototypeName, p->@concretePrototypeField1);
+  return (Prototype*)tmp;
+}
+
+// Вывод информации о конкретном прототипе 1
+void PrototypePrint<Prototype.ConcretePrototype1* p>() {
+  printf("ConcretePrototype1: name = %s, common field = %f, spec field = %f\n",
+         p->prototypeName, p->prototypeField, p->@concretePrototypeField1);
+}
+
+typedef struct ConcretePrototype2 {
+  float concretePrototypeField2;
+} ConcretePrototype2;
+Prototype + <ConcretePrototype2;>;
+
+void ConcretePrototype2Set(struct Prototype.ConcretePrototype2* p,
+                           char* prototypeName,
+                           float concretePrototypeField) {
+  PrototypeSetName((Prototype*)p, prototypeName);
+  p->@concretePrototypeField2 = concretePrototypeField;
+}
+
+Prototype* Clone<Prototype.ConcretePrototype2* p>() {
+  struct Prototype.ConcretePrototype2* tmp =
+                  create_spec(Prototype.ConcretePrototype2);
+  // Копирующего конструктора нет. Поэтому приходится явно
+  ConcretePrototype2Set(tmp, p->prototypeName, p->@concretePrototypeField2);
+  return (Prototype*)tmp;
+}
+
+// Вывод информации о конкретном прототипе 1
+void PrototypePrint<Prototype.ConcretePrototype2* p>() {
+  printf("ConcretePrototype2: name = %s, common field = %f, spec field = %f\n",
+         p->prototypeName, p->prototypeField, p->@concretePrototypeField2);
+}
+
+// In PrototypeFactory you have two concrete prototypes, one for each concrete
+// prototype class, so each time you want to create a bullet, you can use the
+// existing ones and clone those.
+typedef struct PrototypeFactory {
+  Prototype* prototypes[2];
+} PrototypeFactory;
+
+void PrototypeFactorySet(PrototypeFactory* pf) {
+  struct Prototype.ConcretePrototype1* cp1 =
+          create_spec(Prototype.ConcretePrototype1);
+  ConcretePrototype1Set(cp1, "PROTOTYPE_1", 50.f);
+  pf->prototypes[PROTOTYPE_1] = (Prototype*)cp1;
+  struct Prototype.ConcretePrototype2* cp2 =
+          create_spec(Prototype.ConcretePrototype1);
+  ConcretePrototype2Set(cp2, "PROTOTYPE_2", 60.f);
+  pf->prototypes[PROTOTYPE_2] = (Prototype*)cp2;
+}
+
+// Be carefull of free all memory allocated. Again, if you have smart pointers
+// knowelege will be better to use it here.
+void PrototypeFactoryDeletePrototypes(PrototypeFactory* pf) {
+  free(pf->prototypes[PROTOTYPE_1]);
+  free(pf->prototypes[PROTOTYPE_2]);
+}
+
+// Notice here that you just need to specify the type of the prototype you
+// want and the method will create from the object with this type.
+Prototype *CreatePrototype(PrototypeFactory* pf, Type type) {
+  return Clone<pf->prototypes[type]>();
+}
+
+void Client(PrototypeFactory* prototypeFactory) {
+  printf("Let's create a Prototype 1\n");
+
+  Prototype *prototype = CreatePrototype(prototypeFactory, PROTOTYPE_1);
+  Method<prototype>(90);
+  PrototypePrint<prototype>();
+  free(prototype);
+
+  printf("\n");
+
+  printf("Let's create a Prototype 2 \n");
+
+  prototype = CreatePrototype(prototypeFactory, PROTOTYPE_2);
+  Method<prototype>(10);
+  PrototypePrint<prototype>();
+  free(prototype);
+}
+
+int main() {
+  PrototypeFactory prototypeFactory;
+  PrototypeFactorySet(&prototypeFactory);
+
+  Client(&prototypeFactory);
+
+  PrototypeFactoryDeletePrototypes(&prototypeFactory);
+
+  return 0;
+}

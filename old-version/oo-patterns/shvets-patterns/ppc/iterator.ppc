@@ -1,0 +1,292 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+
+// Паттерн Итератор
+
+// Назначение: Даёт возможность последовательно обходить элементы составных
+// объектов, не раскрывая их внутреннего представления.
+
+// В отличие от моего примера с одним типом данных, и разными контейнерами,
+// здесь один контейнер и разные подключаемые данные.
+// У меня также можно использовать и разные типы с разными контейнерами.
+// Но нет явно выделенного итератора. Весь обход инкапсулирован в контейнере.
+// Выдается только текущее значение
+
+
+typedef struct Value {}<> Value;          // Данные контейнера
+// Обобщенная функция вывода значения
+void OutValue<Value* value>() = 0;
+
+// Конкретные Коллекции предоставляют один или несколько методов для получения
+// новых экземпляров итератора, совместимых с классом коллекции.
+
+//------------------------------------------------------------------------------
+// Контейнер на основе одномерного массива,
+// выступающий в роли основы специализации
+#define MAX_SIZE 100
+typedef struct Vector {
+  int size;   // текущее количество элементов
+  Value* array[MAX_SIZE];   // Одномерный массив подключаемых элементов
+} Vector;
+
+// Начальная инициализация контейнера по умолчанию
+void VectorInit(Vector* vector) {
+  vector->size = 0;
+  for(int i = 0; i < MAX_SIZE; ++i) {
+    vector->array[i] = NULL;
+  }
+}
+
+// Добавление значения элемента в вектор
+void VectorAdd(Vector* vector, Value* value) {
+  // printf("10) vector->size = %d\n", vector->size);
+  vector->array[vector->size++] = value;
+  // printf("11) vector->size = %d\n", vector->size);
+}
+
+// Очистка вектора от динамически порожденных элементов
+void VectorClear(Vector* vector) {
+  for(int i = 0; i <vector->size; ++i) {
+    free(vector->array[i]);
+  }
+}
+
+//------------------------------------------------------------------------------
+// Итератор для вектора
+typedef struct VectorIterator {
+  Vector* vector;   // Вектор, связанный с итератором
+  int current;      // Текущее значение индекса в итераторе
+} VectorIterator;
+
+// Инициализация итератора вектора
+void VectorIteratorInit(VectorIterator* vi, Vector* v) {
+  vi->vector = v;
+  vi->current = 0;
+};
+
+// Индекс первого элемента вектора
+void VectorIteratorFirst(VectorIterator* vi) {
+  vi->current = 0;
+};
+
+// Перевод итератора на значение следующего элемента вектора
+void VectorIteratorNext(VectorIterator* vi) {
+  (vi->current)++;
+};
+
+// Проверка выхода итератора за последний элемент вектора
+_Bool VectorIteratorIsDone(VectorIterator* vi) {
+  return (vi->current < vi->vector->size) ? 0 : 1;
+}
+// Индекс текущего элемента вектора
+int VectorIteratorCurrent(VectorIterator* vi) {
+  return vi->current;
+}
+
+// Значение текущего элемента вектора
+Value* VectorIteratorValue(VectorIterator* vi) {
+  return vi->vector->array[vi->current];
+}
+
+//------------------------------------------------------------------------------
+// Основа специализации в виде структуры
+typedef struct Data {
+  int a;
+} Data;
+
+void DataInit(Data* d, int a) {
+  d->a = a;
+}
+
+void set_data(Data* d, int a) {
+  d->a = a;
+}
+
+int DataValue(Data* d) {
+  return d->a;
+}
+
+//------------------------------------------------------------------------------
+// Специализации
+Value + <int;>;   // Специализация обобщения целыми числами
+void OutValue<Value.int* value>() {
+  printf("%d", value->@);
+}
+
+Value + <Data;>;   // Специализация обобщения структурой Data
+void OutValue<Value.Data* value>() {
+  printf("%d", value->@a);
+}
+
+//------------------------------------------------------------------------------
+// Обобщенный контейнер
+typedef struct Container {}<> Container;
+
+// Начальная инициализация контейнера по умолчанию
+void ContainerInit<Container* container>() {}//= 0;
+// Добавление значения элемента в контейнер
+void ContainerAdd<Container* container>(Value* value) {}//= 0;
+// Очистка контейнера от динамически порожденных элементов
+void ContainerClear<Container* container>() {}//= 0;
+
+//------------------------------------------------------------------------------
+// Итератор над обобщенным контейнером
+typedef struct ContainerIterator {}<> ContainerIterator;
+
+// Инициализация итератора контейнера
+void ContainerIteratorInit<ContainerIterator* ci> (Container* c) = 0;
+// Индекс первого элемента контейнера
+void ContainerIteratorFirst<ContainerIterator* сi>() = 0;
+// Перевод итератора на значение следующего элемента контейнера
+void ContainerIteratorNext<ContainerIterator* сi>() = 0;
+// Проверка выхода итератора за последний элемент контейнера
+_Bool ContainerIteratorIsDone<ContainerIterator* ci>() {return 0;} //= 0;
+// Значение текущего элемента вектора
+Value* ContainerIteratorValue<ContainerIterator* ci>() {return NULL;} //= 0;
+
+//------------------------------------------------------------------------------
+// Специализированный контейнер на основе вектора
+Container + <Vector;>;
+// Начальная инициализация контейнера по умолчанию
+void ContainerInit<Container.Vector* c>() {
+  VectorInit(&(c->@));
+}
+// Добавление значения элемента в контейнер
+void ContainerAdd<Container.Vector* c>(Value* value) {
+  VectorAdd(&(c->@), value);
+}
+// Очистка контейнера от динамически порожденных элементов
+void ContainerClear<Container.Vector* c>() {
+  VectorClear(&(c->@));
+}
+
+//------------------------------------------------------------------------------
+// Специализированный итератор над специализированным контейнером-вектором
+ContainerIterator + <VectorIterator;>;
+
+// Инициализация итератора контейнера
+void ContainerIteratorInit<ContainerIterator.VectorIterator* ci> (Container* c) {
+  struct Container.Vector* cv = (struct Container.Vector*)c;
+  VectorIteratorInit(&(ci->@), &(cv->@));
+}
+// Индекс первого элемента контейнера
+void ContainerIteratorFirst<ContainerIterator.VectorIterator* ci>() {
+  VectorIteratorFirst(&(ci->@));
+}
+// Перевод итератора на значение следующего элемента контейнера
+void ContainerIteratorNext<ContainerIterator.VectorIterator* ci>() {
+  VectorIteratorNext(&(ci->@));
+}
+// Проверка выхода итератора за последний элемент контейнера
+_Bool ContainerIteratorIsDone<ContainerIterator.VectorIterator* ci>() {
+  return VectorIteratorIsDone(&(ci->@));
+}
+// Значение текущего элемента вектора
+Value* ContainerIteratorValue<ContainerIterator.VectorIterator* ci>() {
+  return VectorIteratorValue(&(ci->@));
+}
+
+//------------------------------------------------------------------------------
+// The client code may or may not know about the Concrete Iterator or Collection
+// classes, for this implementation the container is generic so you can used
+// with an int or with a custom class.
+void ClientCode() {
+  printf("________________Vector Iterator with int________________\n");
+
+  // Container<int> cont;
+
+  // Так как элементы подключаются через указатель, то их необходимо создавать
+  // либо динамически, либо через локальные переменные (например, массив специализаций)
+  struct Value.int vecInt[10];
+  struct Value.int vecIntScalar;
+  Vector vec;
+  VectorInit(&vec);
+  for (int i = 0; i < 10; i++) {
+    init_spec(Value.int, &(vecInt[i]));
+    vecIntScalar.@ = i;
+    vecInt[i] = vecIntScalar;
+    // vecInt[i].@ = i; --- Проблемы с прямым присваиванием!!!
+    VectorAdd(&vec, (Value*)&(vecInt[i]));
+  }
+
+  VectorIterator it;
+  VectorIteratorInit(&it, &vec);
+  // VectorIteratorFirst(&it);
+  // printf("VectorIteratorFirst: %d\n", );
+  for (VectorIteratorFirst(&it); !VectorIteratorIsDone(&it); VectorIteratorNext(&it)) {
+    // OutValue<vec.array[VectorIteratorCurrent(&it)]>();
+    OutValue<VectorIteratorValue(&it)>();
+    printf("\n");
+  }
+
+  printf("_______________Vector Iterator with custom Struct_______________\n");
+  Vector vec2;
+  struct Value.Data a, b, c;
+  // struct Value.Data a;
+  // struct Value.Data b;
+  // struct Value.Data c;
+  a.@a = 100; b.@a = 1000, c.@a = 10000;
+  VectorAdd(&vec2, (Value*)&a);
+  VectorAdd(&vec2, (Value*)&b);
+  VectorAdd(&vec2, (Value*)&c);
+  VectorIterator it2;
+  VectorIteratorInit(&it2, &vec2);
+  for (VectorIteratorFirst(&it2); !VectorIteratorIsDone(&it2); VectorIteratorNext(&it2)) {
+    // OutValue<vec2.array[VectorIteratorCurrent(&it2)]>();
+    OutValue<VectorIteratorValue(&it2)>();
+    printf("\n");
+  }
+
+  printf("________________Container Iterator with int________________\n");
+
+  // Так как элементы подключаются через указатель, то их необходимо создавать
+  // либо динамически, либо через локальные переменные (например, массив специализаций)
+
+  struct Container.Vector cvec;
+  VectorInit(&(cvec.@));
+  for (int i = 0; i < 10; i++) {
+    init_spec(Value.int, &(vecInt[i]));
+    vecIntScalar.@ = i;
+    vecInt[i] = vecIntScalar;
+    // vecInt[i].@ = i; --- Проблемы с прямым присваиванием!!!
+    VectorAdd(&(cvec.@), (Value*)&(vecInt[i]));
+  }
+
+  struct ContainerIterator.VectorIterator cit;
+  ContainerIteratorInit<(ContainerIterator*)&cit>((Container*)&cvec);
+  // VectorIteratorFirst(&it);
+  // printf("VectorIteratorFirst: %d\n", );
+  for (ContainerIteratorFirst<(ContainerIterator*)&cit>();
+       !ContainerIteratorIsDone<(ContainerIterator*)&cit>();
+        ContainerIteratorNext<(ContainerIterator*)&cit>()) {
+    // OutValue<vec.array[VectorIteratorCurrent(&it)]>();
+    Value* v = ContainerIteratorValue<(ContainerIterator*)&cit>();
+    OutValue<v>();
+    printf("\n");
+  }
+
+  printf("______________Container Iterator with custom Struct______________\n");
+  struct Container.Vector cvec2;
+  VectorInit(&(cvec2.@));
+  VectorAdd(&cvec2.@, (Value*)&a);
+  VectorAdd(&cvec2.@, (Value*)&b);
+  VectorAdd(&cvec2.@, (Value*)&c);
+  struct ContainerIterator.VectorIterator cit2;
+  ContainerIteratorInit<(ContainerIterator*)&cit2>((Container*)&cvec2);
+  for (ContainerIteratorFirst<(ContainerIterator*)&cit2>();
+       !ContainerIteratorIsDone<(ContainerIterator*)&cit2>();
+        ContainerIteratorNext<(ContainerIterator*)&cit2>()) {
+    // OutValue<vec2.array[VectorIteratorCurrent(&it2)]>();
+    Value* v = ContainerIteratorValue<(ContainerIterator*)&cit2>();
+    OutValue<v>();
+    printf("\n");
+  }
+
+}
+
+int main() {
+  ClientCode();
+  return 0;
+}

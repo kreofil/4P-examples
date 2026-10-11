@@ -1,0 +1,112 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+
+// Интерфейс Посредника предоставляет метод, используемый компонентами для
+// уведомления посредника о различных событиях. Посредник может реагировать на
+// эти события и передавать исполнение другим компонентам.
+typedef struct BaseComponent BaseComponent;
+typedef struct Mediator {}<> Mediator;
+
+void Notify<Mediator* m>(BaseComponent *sender, char* event) {
+  printf("Error: Abstract Notify\n");
+}
+//= 0;
+
+
+// Базовый Компонент обеспечивает базовую функциональность хранения экземпляра
+// посредника внутри объектов компонентов.
+typedef struct BaseComponent {
+  Mediator *mediator;
+}<> BaseComponent;
+
+// void BaseComponentInit(BaseComponent* bc; Mediator *mediator) {
+//   bc->mediator = mediator;
+// }
+
+void SetMediator(BaseComponent* bc, Mediator *mediator) {
+  bc->mediator = mediator;
+}
+
+// Конкретные Компоненты реализуют различную функциональность. Они не зависят от
+// других компонентов. Они также не зависят от каких-либо конкретных классов
+// посредников.
+typedef struct Component1 {} Component1;
+BaseComponent + <Component1;>;
+
+void DoA(struct BaseComponent.Component1* c) {
+  printf("Component 1 does A.\n");
+  Notify<c->mediator>((BaseComponent*)c, "A");
+}
+
+void DoB(struct BaseComponent.Component1* c) {
+  printf("Component 1 does B.\n");
+  Notify<c->mediator>((BaseComponent*)c, "B");
+}
+
+typedef struct Component2 {} Component2;
+BaseComponent + <Component2;>;
+
+void DoC(struct BaseComponent.Component2* c) {
+  printf("Component 2 does C.\n");
+  Notify<c->mediator>((BaseComponent*)c, "C");
+}
+
+void DoD(struct BaseComponent.Component2* c) {
+  printf("Component 2 does D.\n");
+  Notify<c->mediator>((BaseComponent*)c, "D");
+}
+
+// Конкретные Посредники реализуют совместное поведение,
+// координируя отдельные компоненты.
+typedef struct ConcreteMediator {
+  struct BaseComponent.Component1 *component1;
+  struct BaseComponent.Component2 *component2;
+} ConcreteMediator;
+Mediator + <ConcreteMediator;>;
+
+void ConcreteMediatorInit(struct Mediator.ConcreteMediator* cm,
+                          BaseComponent.Component1 *c1,
+                          BaseComponent.Component2 *c2) {
+  cm->@component1 = c1;
+  cm->@component2 = c2;
+  SetMediator((BaseComponent*)cm->@component1, (Mediator*)cm);
+  SetMediator((BaseComponent*)cm->@component2, (Mediator*)cm);
+}
+
+void Notify<Mediator.ConcreteMediator* c>(BaseComponent *sender, char* event) {
+  if (!strcmp(event, "A")) {
+    printf("Mediator reacts on A and triggers following operations:\n");
+    DoC(c->@component2);
+  }
+  if (!strcmp(event, "D")) {
+    printf("Mediator reacts on D and triggers following operations:\n");
+    DoB(c->@component1);
+    DoC(c->@component2);
+  }
+}
+
+// Клиентский код.
+void ClientCode() {
+  struct BaseComponent.Component1 *c1 = create_spec(BaseComponent.Component1);
+  struct BaseComponent.Component2 *c2 = create_spec(BaseComponent.Component2);
+  struct Mediator.ConcreteMediator *mediator = create_spec(Mediator.ConcreteMediator);
+  SetMediator((BaseComponent*)c1, (Mediator*)mediator);
+  SetMediator((BaseComponent*)c2, (Mediator*)mediator);
+  ConcreteMediatorInit(mediator, c1, c2);
+  printf("Client triggers operation A.\n");
+  DoA(c1);
+  printf("\n");
+  printf("Client triggers operation D.\n");
+  DoD(c2);
+
+  free(c1);
+  free(c2);
+  free(mediator);
+}
+
+int main() {
+  ClientCode();
+  return 0;
+}

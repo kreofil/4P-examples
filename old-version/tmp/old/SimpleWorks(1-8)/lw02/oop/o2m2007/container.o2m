@@ -1,0 +1,123 @@
+(*******************************************************************************
+| container.o: содержит модуль Container с процедурами и типами, 
+| осуществляющими хранение и обработку различных геометрических фигур,
+| хранимых как обобщенные
+*******************************************************************************)
+
+MODULE container; 
+IMPORT In, Out, FileIO, figure, figureProc;
+
+(******************************************************************************)
+(* Константа, задающая максимальное количество фигур в контейнере *)
+CONST maxSize = 100;                                                
+
+(******************************************************************************)
+TYPE  
+  (* Структуры данных описывающие обобщенную геометрическую фигуру *)
+
+  (* Указатель на контейнер *)
+  Pcont* = POINTER TO cont;
+
+  (* Запись, определяющая контейнер, хранящий различные геометрические фигуры *)
+  cont* = RECORD
+    size*: INTEGER; (* Количество фигур, уже размещенных в контейнере *)   
+    fig*:  ARRAY maxSize OF figure.Pfig;  (* хранилище *)
+  END;               
+
+(******************************************************************************)
+(* Процедура динамического создания и инициализации нового контейнера *)
+PROCEDURE New*(): Pcont;
+VAR tmp : Pcont;
+BEGIN     
+    NEW(tmp);            
+    tmp^.size := 0;
+    RETURN tmp
+END New; 
+
+(******************************************************************************)
+(* Процедура инициализации уже существующего контейнера *)
+PROCEDURE (VAR c: cont) Init*;
+BEGIN     
+    c.size := 0;
+END Init; 
+
+(******************************************************************************)
+(* Процедура добавления в контейнер новой геометрической фигуры *)
+PROCEDURE (VAR c: cont) AddFigure*(f: figure.Pfig);
+BEGIN     
+    c.fig[c.size] := f;
+    c.size := c.size + 1
+END AddFigure; 
+
+(******************************************************************************)
+(* Процедура ввода элементов контейнера с консоли *)
+PROCEDURE (VAR c: cont) Input*;
+VAR
+  tag : INTEGER;
+  pf : figure.Pfig;
+  i: INTEGER;
+BEGIN                                
+  i := 0;
+  pf := figureProc.Input();
+  WHILE pf # NIL DO
+    i := i + 1;
+    c.AddFigure(pf);
+    pf := figureProc.Input();
+  END;
+  RETURN
+
+END Input; 
+
+(******************************************************************************)
+(* Процедура ввода всех элементов контейнера из файла *)
+PROCEDURE (VAR c: cont) FileInput*(VAR inFile : FileIO.TFile) : INTEGER;
+VAR
+  flag : INTEGER;
+  tag : INTEGER;
+  pf : figure.Pfig;
+  i: INTEGER;
+BEGIN                                
+  i := 0;
+  pf := figureProc.FileInput(inFile);
+  WHILE pf # NIL DO
+    i := i + 1;
+    c.AddFigure(pf);
+    pf := figureProc.FileInput(inFile);
+  END;
+  RETURN i
+
+END FileInput; 
+
+(******************************************************************************)
+(* Процедура вывода всех элементов контейнера *)
+PROCEDURE  (VAR c: cont) Output*;   
+VAR   
+  i: INTEGER;
+BEGIN             
+  FOR i := 0 TO c.size-1 DO
+    c.fig[i].Output;    
+  END;
+  Out.Ln;
+  Out.Int(c.size, 0); 
+  Out.String(" figures in container."); 
+  Out.Ln
+
+END Output; 
+
+(******************************************************************************)
+(* Процедура вывода всех элементов контейнера в файл *)
+PROCEDURE (VAR c: cont) FileOutput*(VAR outFile : FileIO.TFile);   
+VAR   
+  i, flag: INTEGER;
+BEGIN             
+  FOR i := 0 TO c.size-1 DO
+    c.fig[i].FileOutput(outFile);    
+  END;
+  flag := outFile.Ln();
+  flag := outFile.WriteInt(c.size, 0); 
+  flag := outFile.WriteString(" figures in container."); 
+  flag := outFile.Ln()
+
+END FileOutput; 
+
+END container.

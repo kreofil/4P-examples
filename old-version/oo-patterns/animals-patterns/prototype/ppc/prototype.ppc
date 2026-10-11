@@ -1,0 +1,102 @@
+// Компилировать: ppclang -xc prototype.ppc -o prototype
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Паттерн Прототип. Позволяет копировать объекты,
+// не вдаваясь в подробности их реализации.
+
+// Используется клонирование животных.
+typedef struct Animal {const char* name;}<> Animal;
+void Init(Animal* a, const char* name) {a->name = name;}
+void GetInfo<Animal* a>() = 0;
+Animal* Clone<Animal* a>() {return NULL;}
+Animal* MemClone<Animal* a>() {return NULL;}
+
+typedef struct Duck {} Duck;
+Animal + <Duck;>;
+void GetInfo<Animal.Duck* a>(){
+  printf("The Duck %s created\n", a->name);
+}
+// Клонирование утки с созданием специализации
+Animal* Clone<Animal.Duck* a>() {
+  printf("The clone of duck: ");
+  Animal* clone = create_spec(Animal.Duck);
+  Init(clone, a->name);
+  GetInfo<clone>();
+  return clone;
+}
+// Клонирование утки с использованием копирования памяти
+Animal* MemClone<Animal.Duck* a>() {
+  printf("The memory clone of duck: ");
+  // unsigned long size = sizeof(*a);
+  unsigned long size = sizeof(struct Animal.Duck); // нужно писать пока struct
+  Animal* clone = (Animal*)malloc(size);
+  memcpy(clone, a, size);
+  GetInfo<clone>();
+  return clone;
+}
+
+typedef struct Dog {} Dog;
+Animal + <Dog;>;
+void GetInfo<Animal.Dog* a>(){
+  printf("The Dog %s created\n", a->name);
+}
+// Клонирование собаки с созданием специализации
+Animal* Clone<Animal.Dog* a>() {
+  printf("The clone of dog: ");
+  Animal* clone = create_spec(Animal.Dog);
+  Init(clone, a->name);
+  GetInfo<clone>();
+  return clone;
+}
+// Клонирование собаки с использованием копирования памяти
+Animal* MemClone<Animal.Dog* a>() {
+  printf("The clone of dog: ");
+  // unsigned long size = sizeof(*a);
+  unsigned long size = sizeof(struct Animal.Dog); // нужно писать пока struct
+  Animal* clone = malloc(size);
+  memcpy(clone, a, size);
+  GetInfo<clone>();
+  return clone;
+}
+
+void Client() {
+  printf("Let's create a Duck\n");
+  struct Animal.Duck duck;
+  Init((Animal*)&duck, "Grey Neck");
+  GetInfo<(Animal*)&duck>();
+  printf("\nLet's create a Clone of the Duck using Clone function\n");
+  Animal* duckClone = Clone<(Animal*)&duck>();
+  free(duckClone);
+
+  printf("\nLet's create a Dog\n");
+  struct Animal.Dog dog;
+  Init((Animal*)&dog, "Rex");
+  GetInfo<(Animal*)&dog>();
+  printf("\nLet's create a Clone of the Dog using Clone function\n");
+  Animal* dogClone = Clone<(Animal*)&dog>();
+  free(dogClone);
+
+  printf("\nLet's create a next Duck\n");
+  struct Animal.Duck duck2;
+  Init((Animal*)&duck2, "Drake");
+  GetInfo<(Animal*)&duck2>();
+  printf("\nLet's create a Clone of the next Duck using MemClone function\n");
+  duckClone = MemClone<(Animal*)&duck2>();
+  free(duckClone);
+
+  printf("\nLet's create a next Dog\n");
+  struct Animal.Dog dog2;
+  Init((Animal*)&dog2, "Mu-mu");
+  GetInfo<(Animal*)&dog2>();
+  printf("\nLet's create a Clone of the next Dog using MemClone function\n");
+  dogClone = MemClone<(Animal*)&dog2>();
+  free(dogClone);
+}
+
+int main() {
+  Client();
+
+  return 0;
+}

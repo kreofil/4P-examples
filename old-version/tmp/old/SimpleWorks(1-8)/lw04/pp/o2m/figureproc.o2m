@@ -1,0 +1,97 @@
+(*******************************************************************************
+| figureproc.o: содержит модуль figureProc с процедурами, осуществляющими 
+| обработку специализаций, связанных с обобщенной геометрической фигурой.
+| Эти процедуры лучше разместить после того, как будут созданы специализации,
+| т.к. их структуру необходимо знать во время обработки.
+*******************************************************************************)
+
+MODULE figureProc; 
+IMPORT In, Out, FileIO, figure, rectangle, triangle;
+
+(******************************************************************************)
+(* Процедура, вычисляющая переметр обобщенной фигуры *)
+PROCEDURE Perimeter*(VAR f: figure.fig) : REAL;     
+VAR
+  p : REAL;
+BEGIN 
+  WITH f: rectangle.rect DO p := rectangle.Perimeter(f)
+     | f: triangle.trian DO p := triangle.Perimeter(f)
+  ELSE p := 0
+  END;  
+  RETURN p     
+
+END Perimeter;
+
+(******************************************************************************)
+(* Процедура, осуществляющая создание и ввод одной из специализаций  *)
+(* после предварительного анализа признака вводимой фигуры *)
+PROCEDURE Input*() : figure.Pfig;
+VAR
+  tag : INTEGER;
+  pf : figure.Pfig;
+  pr : rectangle.Prect;
+  pt : triangle.Ptrian;
+BEGIN 
+  Out.String("Input figure tag (1 - rectangle; 2 - triangle; else - NIL): "); 
+  Out.Ln; 
+  In.Int(tag);
+  IF tag = 1 THEN 
+    NEW(pr); rectangle.Input(pr^); pf := pr;
+  ELSIF tag = 2 THEN 
+    NEW(pt); triangle.Input(pt^); pf := pt;
+  ELSE                                    
+    pf := NIL;
+  END;
+  RETURN pf    
+
+END Input;
+
+(******************************************************************************)
+(* Процедура, осуществляющая вывод специализаций через параметр-переменную *)
+
+PROCEDURE Output*(VAR f: figure.fig);
+BEGIN 
+  WITH f: rectangle.rect DO rectangle.Output(f)
+     | f: triangle.trian   DO triangle.Output(f)
+  ELSE Out.String("Invalid figure"); Out.Ln
+  END
+END Output;
+
+(******************************************************************************)
+(* Процедура Заполнения фигуры из файла *)
+PROCEDURE FileInput*(VAR inFile : FileIO.TFile) : figure.Pfig;
+VAR
+  flag : INTEGER;
+  tag : INTEGER;
+  pf : figure.Pfig;
+  pr : rectangle.Prect;
+  pt : triangle.Ptrian;
+BEGIN     
+  flag := inFile.ReadInt(tag); 
+
+  IF tag = 1 THEN 
+    NEW(pr); rectangle.FileInput(inFile, pr^); pf := pr;
+  ELSIF tag = 2 THEN 
+    NEW(pt); triangle.FileInput(inFile, pt^); pf := pt;
+  ELSE                                    
+    pf := NIL;
+  END;
+  RETURN pf
+
+END FileInput; 
+
+(******************************************************************************)
+(* Процедура вывода в файл, использующая передачу параметра-переменной *)
+PROCEDURE FileOutput*(VAR outFile : FileIO.TFile; VAR f: figure.fig);
+VAR 
+  flag : INTEGER;
+BEGIN     
+  WITH f: rectangle.rect DO rectangle.FileOutput(outFile, f)
+     | f: triangle.trian DO triangle.FileOutput(outFile, f)
+  ELSE
+    flag := outFile.WriteString("Invalid figure");
+    flag := outFile.Ln();
+  END
+END FileOutput;
+
+END figureProc.

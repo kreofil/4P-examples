@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="Generator" content="Kate, the KDE Advanced Text Editor" />
+<title>main.cpp</title>
+</head>
+<!-- Highlighting: "C++" -->
+<body>
+<pre style='color:#f8f8f2;background-color:#272822;'>
+<span style='color:#75715e;'>// ОО версия программы про хорошего и плохого полицейских,</span>
+<span style='color:#75715e;'>// использующая ОО (динамический) полиморфизм</span>
+<span style='color:#f92672;'>#include </span><span style='color:#e6db74;'>&lt;stdio.h&gt;</span>
+
+<span style='color:#f92672;'>struct</span> Cop { <span style='color:#75715e;'>// Обобщенный полицейский</span>
+  <span style='color:#f92672;'>virtual</span> <i><span style='color:#66d9ef;'>void</span></i> Action() {
+    printf(<span style='color:#e6db74;'>&quot;Непонятно, какой полицейский.</span><span style='color:#ae81ff;'>\n</span><span style='color:#e6db74;'>&quot;</span>);
+  }
+};
+
+<span style='color:#f92672;'>struct</span> BadCop: Cop { <span style='color:#75715e;'>// Плохой полицейский</span>
+  <span style='color:#f92672;'>virtual</span> <i><span style='color:#66d9ef;'>void</span></i> Action() {
+    printf(<span style='color:#e6db74;'>&quot;Бац-бац...</span><span style='color:#ae81ff;'>\n</span><span style='color:#e6db74;'>&quot;</span>);
+  }
+};
+
+<span style='color:#f92672;'>struct</span> GoodCop: Cop { <span style='color:#75715e;'>// Хороший полицейский</span>
+  <span style='color:#f92672;'>virtual</span> <i><span style='color:#66d9ef;'>void</span></i> Action() {
+    printf(<span style='color:#e6db74;'>&quot;Именем закона...</span><span style='color:#ae81ff;'>\n</span><span style='color:#e6db74;'>&quot;</span>);
+  }
+};
+
+<i><span style='color:#66d9ef;'>int</span></i> main() {
+  <i><span style='color:#66d9ef;'>int</span></i> cop;
+  printf(<span style='color:#e6db74;'>&quot;Какой полицейский? (0 - плохой, 1 - хороший): &quot;</span>);
+  scanf(<span style='color:#e6db74;'>&quot;</span><span style='color:#ae81ff;'>%d</span><span style='color:#e6db74;'>&quot;</span>, &amp;cop);
+
+  <span style='color:#75715e;'>// Пусть существуют одновременно разные полицейские</span>
+  <span style='color:#75715e;'>// Лень использовать кучу</span>
+  BadCop  badCop;   <span style='color:#75715e;'>// плохой</span>
+  GoodCop goodCop;  <span style='color:#75715e;'>// хороший</span>
+  Cop     otherCop; <span style='color:#75715e;'>// иной</span>
+
+  Cop* pCop = (cop==<span style='color:#ae81ff;'>0</span>? &amp;badCop:(cop==<span style='color:#ae81ff;'>1</span>? &amp;goodCop: &amp;otherCop));
+  pCop-&gt;Action();
+
+  <span style='color:#f92672;'>return</span> <span style='color:#ae81ff;'>0</span>;
+}
+</pre>
+</body>
+</html>

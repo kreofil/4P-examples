@@ -1,0 +1,6 @@
+Filled container. 
+Container contains 2 elements.
+0: It is Rectangle: x = 3, y = 4
+1: It is Triangle: a = 1, b = 1, c = 1
+Empty container. 
+Container contains 0 elements.
