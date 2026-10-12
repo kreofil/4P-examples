@@ -2,7 +2,9 @@
 
 # Examples of programs demonstrating the capabilities of procedural-parametric programming
 
-Along with examples of procedural-parametric programs, examples of programs written using other programming paradigms are also provided for comparison. The programs are divided into thematic directories.
+The repository is currently undergoing refactoring, with programs being categorized according to programming paradigms and languages.
+
+Alongside examples of procedural-parametric programs, the repository includes examples written using other programming paradigms for comparison. The programs are organized by paradigm and language, and a consistent directory structure is used for examples implemented across different languages ​​and paradigms. This structure is intended to facilitate working with the various paradigms and programming languages.
 
 ## evolution
 
