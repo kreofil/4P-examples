@@ -8,7 +8,7 @@ Alongside examples of procedural-parametric programs, the repository includes ex
 
 ## evolution
 
-The [evolution](evolution) directory contains examples demonstrating the possibilities of evolutionary program expansion. That is, adding new functionality and data without changing the previously written code. The main idea is to compare the PP paradigm with other programming paradigms.
+The evolution directory contains examples demonstrating the possibilities of evolutionary program expansion. That is, adding new functionality and data without changing the previously written code. The main idea is to compare the PP paradigm with other programming paradigms.
 
 They are considered as options that provide direct extension using the techniques that this or that paradigm provides. In this situation, where direct solutions do not provide evolutionary extension, an extension with changes is implemented.
 

@@ -1,0 +1,9 @@
+Result of building from Simple figures:
+Container contents 4 elements.
+0: It is Simple Rectangle: x = 20, y = 15
+1: It is Simple Rectangle: x = 100, y = 80
+2: It is Simple Rectangle: x = 20, y = 60
+3: It is Simple Triangle: a = 120, b = 80, c = 70
+Result of figures counting:
+    number of rectangles: 3
+    number of triangles:  1
