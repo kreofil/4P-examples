@@ -17,7 +17,7 @@ enum {max_len = 100}; // максимальная длина
 // Простейший контейнер на основе одномерного массива
 typedef struct Container {
   int len; // текущая длина
-  struct Figure.rect cont[max_len];
+  struct Figure cont[max_len];
 } Container;
 
 #endif // __container__

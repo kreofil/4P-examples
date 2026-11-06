@@ -21,7 +21,7 @@ double TrianglePerimeter(Triangle *t);
 double FigurePerimeterZero(Figure *f) {
   if(get_subtype_index(Figure.rect) == get_spec_var_index(f)) {
     return RectanglePerimeter(&(((Figure.rect*)f)->rect));
-  } else if(get_subtype_index(Figure.rect) == get_spec_var_index(f)) {
+  } else if(get_subtype_index(Figure.trian) == get_spec_var_index(f)) {
     return TrianglePerimeter(&(((Figure.trian*)f)->trian));
   } else {
     return 0.0;

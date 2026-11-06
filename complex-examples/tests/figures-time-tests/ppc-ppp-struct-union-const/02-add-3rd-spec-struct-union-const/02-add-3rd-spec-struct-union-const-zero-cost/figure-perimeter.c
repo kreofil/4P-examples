@@ -16,13 +16,18 @@ double FigurePerimeter<Figure *f>() {return 0.0;} //= 0;
 double RectanglePerimeter(Rectangle *r);
 // Вычисление периметра треугольника
 double TrianglePerimeter(Triangle *t);
+// Вычисление периметра круга
+double CirclePerimeter(Circle *c);
+
 //------------------------------------------------------------------------------
 // Вычисление периметра для фигуры с использованием "нулевой стоимости"
 double FigurePerimeterZero(Figure *f) {
   if(get_subtype_index(Figure.rect) == get_spec_var_index(f)) {
     return RectanglePerimeter(&(((Figure.rect*)f)->rect));
-  } else if(get_subtype_index(Figure.rect) == get_spec_var_index(f)) {
+  } else if(get_subtype_index(Figure.trian) == get_spec_var_index(f)) {
     return TrianglePerimeter(&(((Figure.trian*)f)->trian));
+  } else if(get_subtype_index(Figure.circ) == get_spec_var_index(f)) {
+    return CirclePerimeter(&(((Figure.circ*)f)->circ));
   } else {
     return 0.0;
   }

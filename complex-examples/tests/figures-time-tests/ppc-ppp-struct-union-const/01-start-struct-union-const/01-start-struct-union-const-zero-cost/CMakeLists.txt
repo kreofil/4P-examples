@@ -12,12 +12,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_DIR}/../bin")
 
 # Установка переменной со списком исходников
 set(SOURCE_FILES
-    # headers
     figure.h
     rectangle.h
-    # figure-rectangle.h
     triangle.h
-    # figure-triangle.h
     container.h
 
     # sources
