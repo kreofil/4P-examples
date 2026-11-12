@@ -1,6 +1,7 @@
 # set minimum cmake version
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 
+set(CMAKE_C_COMPILER ppchibicc CACHE FILEPATH "Компилятор C")
 # project name and language
 project(02-new-spec)
 

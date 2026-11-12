@@ -11,14 +11,14 @@ typedef struct Rectangle {int x, y;} Rectangle;
 typedef struct Triangle {int a, b, c;} Triangle;
 
 //------------------------------------------------------------------------------
-// typedef struct Figure {} case {
-//   Triangle t;
-//   Rectangle r;
-// } Figure;
+typedef struct Figure {} case {
+  Triangle t;
+  Rectangle r;
+} const Figure;
 
-typedef struct Figure {} case {} Figure;
-Figure + {Triangle t;};
-Figure + {Rectangle r;};
+// typedef struct Figure {} case {} Figure;
+// Figure + {Triangle t;};
+// Figure + {Rectangle r;};
 
 //------------------------------------------------------------------------------
 // Полиморфнай функция вывода фигуры
@@ -101,5 +101,3 @@ int main() {
 
   return 0;
 }
-
-// Разные варианты работают

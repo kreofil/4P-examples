@@ -36,3 +36,7 @@ set(SOURCE_FILES
 )
 
 add_executable(02-new-spec ${SOURCE_FILES})
+
+# Основной режим компиляции: LLVM с уровнем O2.
+target_compile_options(02-new-spec PRIVATE --backend=llvm -O2)
+target_link_options(02-new-spec PRIVATE --backend=llvm)

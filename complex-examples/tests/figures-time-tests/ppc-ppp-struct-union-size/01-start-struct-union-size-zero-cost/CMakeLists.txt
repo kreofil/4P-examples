@@ -1,9 +1,8 @@
 # set minimum cmake version
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
-project(evo-demo)               # Название проекта
 
-# SET(CMAKE_C_COMPILER ppclang)
-SET(CMAKE_C_COMPILER ppchibicc)
+set(CMAKE_C_COMPILER ppchibicc CACHE FILEPATH "Компилятор C")
+project(evo-demo)               # Название проекта
 
 set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type is Debug" FORCE)
 
@@ -11,7 +10,7 @@ set(BUILD_DIR "${CMAKE_BINARY_DIR}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_DIR}/../bin")
 
 # Установка переменной со списком исходников
-set(SOURCE_FILES
+set(HEADERS_FILES
     # headers
     figure.h
     rectangle.h
@@ -19,7 +18,9 @@ set(SOURCE_FILES
     triangle.h
     # figure-triangle.h
     container.h
+)
 
+set(SOURCE_FILES
     # sources
     figures-input.c
     figure-in.c
@@ -45,3 +46,17 @@ set(SOURCE_FILES
 )
 
 add_executable(evo-demo ${SOURCE_FILES})
+
+# Основной режим компиляции: LLVM с уровнем O2.
+target_compile_options(evo-demo PRIVATE --backend=llvm -O2)
+target_link_options(evo-demo PRIVATE --backend=llvm)
+
+enable_testing()
+add_test(NAME figures-run
+    COMMAND evo-demo "${CMAKE_CURRENT_SOURCE_DIR}/data/input1.txt"
+                     "${CMAKE_CURRENT_BINARY_DIR}/output1.txt")
+add_test(NAME figures-output
+    COMMAND "${CMAKE_COMMAND}" -E compare_files
+            "${CMAKE_CURRENT_SOURCE_DIR}/data/output1.txt"
+            "${CMAKE_CURRENT_BINARY_DIR}/output1.txt")
+set_tests_properties(figures-output PROPERTIES DEPENDS figures-run)

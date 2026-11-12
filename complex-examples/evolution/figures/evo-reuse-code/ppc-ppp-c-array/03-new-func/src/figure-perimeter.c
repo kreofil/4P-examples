@@ -8,4 +8,4 @@
 
 //------------------------------------------------------------------------------
 // Вычисление периметра для текущей фигуры
-double FigurePerimeter<Figure *f>() {return 0.0;} //= 0;
+double FigurePerimeter<Figure *f>(void) {return 0.0;} //= 0;

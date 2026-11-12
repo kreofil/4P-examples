@@ -8,9 +8,11 @@ for var in "01-start" "02-new-spec" "03-new-func" "04-new-field" \
            "05-rect-only-out" "06-mm" "07-mm-new-spec" "08-more-gen"
 do
   echo $var/build:
+  mkdir $var/build/
   cd $var/build/
   cmake ..
   make
   rm -rf ../build/*
+  rm -rf ../build
   cd ../../
 done

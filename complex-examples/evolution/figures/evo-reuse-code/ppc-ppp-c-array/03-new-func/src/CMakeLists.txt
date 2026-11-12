@@ -36,3 +36,8 @@ set(SOURCE_FILES
 )
 
 add_executable(03-new-func ${SOURCE_FILES})
+
+# Основной режим компиляции: LLVM с уровнем O2.
+target_compile_options(03-new-func PRIVATE --backend=llvm -O2)
+target_link_options(03-new-func PRIVATE --backend=llvm)
+

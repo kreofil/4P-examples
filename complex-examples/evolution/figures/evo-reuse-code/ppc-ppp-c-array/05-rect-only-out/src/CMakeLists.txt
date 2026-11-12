@@ -34,3 +34,7 @@ set(SOURCE_FILES
 )
 
 add_executable(05-rect-only-out ${SOURCE_FILES})
+
+# Основной режим компиляции: LLVM с уровнем O2.
+target_compile_options(05-rect-only-out PRIVATE --backend=llvm -O2)
+target_link_options(05-rect-only-out PRIVATE --backend=llvm)

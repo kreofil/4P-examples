@@ -1,11 +1,9 @@
 # set minimum cmake version
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 
+set(CMAKE_C_COMPILER ppchibicc CACHE FILEPATH "Компилятор C")
 # project name and language
 project(01-start)
-
-# SET(CMAKE_C_COMPILER ppclang)
-SET(CMAKE_C_COMPILER ppchibicc)
 
 set(CMAKE_C_STANDARD 17)
 
@@ -20,3 +18,5 @@ include_directories(BEFORE
 )
 
 add_subdirectory("../../01-start/src" "bin")
+
+

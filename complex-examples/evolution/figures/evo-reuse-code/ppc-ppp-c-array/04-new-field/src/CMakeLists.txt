@@ -35,3 +35,7 @@ set(SOURCE_FILES
 )
 
 add_executable(04-new-field ${SOURCE_FILES})
+
+# Основной режим компиляции: LLVM с уровнем O2.
+target_compile_options(04-new-field PRIVATE --backend=llvm -O2)
+target_link_options(04-new-field PRIVATE --backend=llvm)

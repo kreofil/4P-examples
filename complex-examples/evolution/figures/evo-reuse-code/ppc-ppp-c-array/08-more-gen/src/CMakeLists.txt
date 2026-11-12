@@ -38,3 +38,7 @@ set(SOURCE_FILES
 )
 
 add_executable(08-more-gen ${SOURCE_FILES})
+
+# Основной режим компиляции: LLVM с уровнем O2.
+target_compile_options(08-more-gen PRIVATE --backend=llvm -O2)
+target_link_options(08-more-gen PRIVATE --backend=llvm)
