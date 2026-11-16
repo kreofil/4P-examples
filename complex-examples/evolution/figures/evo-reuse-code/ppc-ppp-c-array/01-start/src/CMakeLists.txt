@@ -1,6 +1,8 @@
 # set minimum cmake version
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type is Debug" FORCE)
+
+# set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type is Debug" FORCE)
+set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type is Release" FORCE)
 
 # Установка переменной со списком исходников
 set(SOURCE_FILES

@@ -1,9 +1,10 @@
 # set minimum cmake version
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
-project(evo-demo)               # Название проекта
 
 SET(CMAKE_C_COMPILER ppclang)
 # SET(CMAKE_C_COMPILER ppchibicc)
+
+project(evo-demo)               # Название проекта
 
 find_package(OpenMP)
 if (OPENMP_FOUND)

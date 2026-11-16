@@ -15,7 +15,6 @@ void GetInfo<Animal.duck* a>() {
 
 // Собака
 typedef struct Dog {} Dog;
-// Animal + <Dog;>;
 Animal + {Dog dog;};
 
 void GetInfo<Animal.dog* a>() {
@@ -38,19 +37,18 @@ AgeDecorator + {Animal animal;};
 void InitAgeDecorator(AgeDecorator* a, int age) {
   a->age = age;
 }
-void GetAgeDecoratorInfo<AgeDecorator* d>() = 0;
-// AgeDecorator + <Animal;>;
-void GetAgeDecoratorInfo<AgeDecorator.animal* d>() {
-  // Перенаправление дальше на животного
-  GetInfo<&(d->animal)>();
-  printf(", I am %d yeas old.", d->age);
-}
+// void GetAgeDecoratorInfo<AgeDecorator* d>() = 0;
+// void GetAgeDecoratorInfo<AgeDecorator.animal* d>() {
+//   // Перенаправление дальше на животного
+//   GetInfo<&(d->animal)>();
+//   printf(", I am %d yeas old.", d->age);
+// }
 
 Animal + {AgeDecorator ageDecorator;};
 // Animal + {AgeDecorator ageDecorator;};
 void GetInfo<Animal.ageDecorator* a>() {
   // Перенаправление дальше на животного
-  struct AgeDecorator.animal* d = (struct AgeDecorator.animal*)&(a->ageDecorator);
+  AgeDecorator.animal* d = (struct AgeDecorator.animal*)&(a->ageDecorator);
   GetInfo<(Animal*)&(d->animal)>();
   printf(", I am %d yeas old.", a->ageDecorator.age);
 }
@@ -70,7 +68,7 @@ Animal + {NameDecorator nameDecorator;};
 void GetInfo<Animal.nameDecorator* a>() {
   printf("My name is %s. ", a->nameDecorator.name);
   // Перенаправление дальше на животного
-  struct NameDecorator.animal* d = (struct NameDecorator.animal*)&(a->nameDecorator);
+  NameDecorator.animal* d = (NameDecorator.animal*)&(a->nameDecorator);
   GetInfo<(Animal*)&(d->animal)>();
 }
 
@@ -89,16 +87,16 @@ int main() {
   ClientCode(&duck);
   ClientCode(&dog);
 
-  Animal.ageDecorator.animal.duck duckAge;
+  Animal.ageDecorator.duck duckAge;
   InitAgeDecorator(&duckAge.ageDecorator, 2);
   ClientCode(&duckAge);
 
-  Animal.nameDecorator.animal.ageDecorator.animal.dog dogNameAge;
+  Animal.nameDecorator.ageDecorator.dog dogNameAge;
   InitNameDecorator(&dogNameAge.nameDecorator, "Rex");
   InitAgeDecorator(&dogNameAge.nameDecorator.animal.ageDecorator, 10);
   ClientCode(&dogNameAge);
 
-  Animal.ageDecorator.animal.nameDecorator.animal.dog otherDogAgeName;
+  Animal.ageDecorator.nameDecorator.dog otherDogAgeName;
   InitAgeDecorator(&otherDogAgeName.ageDecorator, 5);
   InitNameDecorator(&otherDogAgeName.ageDecorator.animal.nameDecorator, "Mu-mu");
   ClientCode(&otherDogAgeName);

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 // Обобщение для животных.
-typedef struct Animal {} case{} Animal;
+typedef struct Animal {} case {} Animal;
 
 // Конкретные животные. Могут в будущем иметь специализации...
 typedef struct Duck {} case{} Duck;
@@ -15,9 +15,9 @@ Animal + {Dog dog;};
 
 // Эволюционно расширяемый перечислимый тип, обеспечивающий полиморфный выбор
 // функции создания продукта.
-typedef struct Creator {} case{} Creator;
+typedef struct Creator {} enum {} Creator;
 // Создатель может также обеспечить реализацию фабричного метода по умолчанию.
-Animal* FactoryMethod<Creator* c>() {return NULL;} // = 0;
+Animal* FactoryMethod<Creator* c>() = 0;
 
 // Обязанность Создателя не заключается в создании продуктов.
 // Обычно он содержит некоторую базовую бизнес-логику, которая основана на объектах Продуктов, возвращаемых фабричным методом.
@@ -29,8 +29,8 @@ Animal* NewAnimal(Creator* c) {
 
 // Конкретные Создатели переопределяют фабричный метод для того, чтобы задать
 // вид животного.
-typedef struct DuckCreator {} DuckCreator;
-Creator + {DuckCreator duckCreator;};
+// typedef struct DuckCreator {} DuckCreator;
+Creator + {duckCreator};
 // Сигнатура метода по-прежнему использует тип обобщенного животного,
 // хотя фактически из функции возвращается конкретное животное.
 // Создатель независит от конкретных видов животных.
@@ -38,9 +38,8 @@ Animal* FactoryMethod<Creator.duckCreator* p>() {
   printf("Duck created!\n");
   return create_spec(Animal.duck);
 }
-typedef struct DogCreator {} DogCreator;
-// Creator + <DogCreator;>;
-Creator + {DogCreator dogCreator;};
+// typedef struct DogCreator {} DogCreator;
+Creator + {dogCreator};
 Animal* FactoryMethod<Creator.dogCreator* p>() {
   printf("Dog created\n");
   return create_spec(Animal.dog);
@@ -77,12 +76,12 @@ int main() {
   // Использование автоматического выделения памяти
   printf("\n");
   printf("Step 3: Launched with the DuckCreator.\n");
-  struct Creator.duckCreator creator3;
+  Creator.duckCreator creator3;
   ClientCode((Creator*)&creator3);
 
   printf("\n");
   printf("Step 4: Launched with the DogCreator.\n");
-  struct Creator.dogCreator creator4;
+  Creator.dogCreator creator4;
   ClientCode((Creator*)&creator4);
 
   return 0;

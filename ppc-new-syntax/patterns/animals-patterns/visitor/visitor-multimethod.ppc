@@ -32,10 +32,10 @@ void Init<Animal.dog* a>() {
 }
 
 // Обобщенный посетитель
-typedef struct Visitor {} case{} Visitor;
+typedef struct Visitor {} enum {} Visitor;
 // Специализации посетителя
-Visitor + {void feed;};
-Visitor + {void swim;};
+Visitor + {feed};
+Visitor + {swim};
 
 // Обобщающие функции, реализованные с использованием мультиметода
 // Посещение животного и действие над ним
@@ -60,14 +60,14 @@ void Client(Animal* animal, Visitor *visitor) {
 }
 
 int main() {
-  struct Animal.duck duck; Init<(Animal*)&duck>();
-  struct Animal.dog dog;   Init<(Animal*)&dog>();
-  struct Visitor.feed feeding;
-  struct Visitor.swim swimming;
-  Client((Animal*)&duck, (Visitor*)&feeding);
-  Client((Animal*)&dog, (Visitor*)&feeding);
-  Client((Animal*)&duck, (Visitor*)&swimming);
-  Client((Animal*)&dog, (Visitor*)&swimming);
+  Animal.duck duck; Init<(Animal*)&duck>();
+  Animal.dog dog;   Init<(Animal*)&dog>();
+  Visitor.feed feeding;
+  Visitor.swim swimming;
+  Client((Animal*)&duck, &feeding);
+  Client((Animal*)&dog, &feeding);
+  Client((Animal*)&duck, &swimming);
+  Client((Animal*)&dog, &swimming);
 
   return 0;
 }

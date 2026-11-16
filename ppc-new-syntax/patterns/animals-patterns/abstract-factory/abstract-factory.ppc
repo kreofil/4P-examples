@@ -41,9 +41,10 @@ Dog + {DomesticDog domesticDog; ToyDog toyDog;};
 //------------------------------------------------------------------------------
 // Обобщенная Абстрактная фабрика.
 // Задается эволюционно расширяемым перечислимым типом.
-typedef struct AbstractFactory {} case{} AbstractFactory;
-AbstractFactory + {void ForDomestic;};
-AbstractFactory + {void ForToy;};
+// typedef struct AbstractFactory {} case{} AbstractFactory;
+// AbstractFactory + {void ForDomestic;};
+// AbstractFactory + {void ForToy;};
+typedef struct AbstractFactory {} enum {ForDomestic, ForToy} const AbstractFactory;
 
 //------------------------------------------------------------------------------
 // Обобщающая функция, определяющая интерфейс для создания одну из уток.

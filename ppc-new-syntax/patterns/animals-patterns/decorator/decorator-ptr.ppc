@@ -42,7 +42,7 @@ void InitAgeDecorator(struct AgeDecorator.animal* da, Animal* a, int age) {
 Animal + {AgeDecorator ageDecorator;};
 void GetInfo<Animal.ageDecorator* a>() {
   // Перенаправление дальше на животного
-  struct AgeDecorator.animal *d = (struct AgeDecorator.animal*)&a->ageDecorator;
+  AgeDecorator.animal *d = (struct AgeDecorator.animal*)&a->ageDecorator;
   GetInfo<(Animal*)d->animal>();
   printf(", I am %d yeas old.", a->ageDecorator.age);
 }
@@ -80,22 +80,22 @@ int main() {
   ClientCode((Animal*)&duck);
   ClientCode((Animal*)&dog);
 
-  struct Animal.ageDecorator.animal duckAge;
+  Animal.ageDecorator.animal duckAge;
   InitAgeDecorator(&(duckAge.ageDecorator), (Animal*)&duck, 2);
   ClientCode((Animal*)&duckAge);
 
-  struct Animal.nameDecorator.animal duckName;
+  Animal.nameDecorator.animal duckName;
   InitNameDecorator(&(duckName.nameDecorator), (Animal*)&duck, "Grey Neck");
   ClientCode((Animal*)&duckName);
 
-  struct Animal.nameDecorator.animal dogName;
-  struct Animal.ageDecorator.animal  dogAge;
+  Animal.nameDecorator.animal dogName;
+  Animal.ageDecorator.animal  dogAge;
   InitNameDecorator(&(dogName.nameDecorator), (Animal*)&dog, "Rex");
   InitAgeDecorator(&(dogAge.ageDecorator), (Animal*)&dogName, 10);
   ClientCode((Animal*)&dogAge);
 
-  struct Animal.ageDecorator.animal  otherDogAge;
-  struct Animal.nameDecorator.animal otherDogName;
+  Animal.ageDecorator.animal  otherDogAge;
+  Animal.nameDecorator.animal otherDogName;
   InitAgeDecorator(&(otherDogAge.ageDecorator), (Animal*)&dog, 10);
   InitNameDecorator(&(otherDogName.nameDecorator), (Animal*)&otherDogAge, "Mu-mu");
   ClientCode((Animal*)&otherDogName);
