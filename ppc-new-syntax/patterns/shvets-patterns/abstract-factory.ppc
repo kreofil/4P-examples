@@ -4,20 +4,20 @@
 
 // Каждый отдельный продукт семейства продуктов должен иметь базовый интерфейс.
 // Все вариации продукта должны реализовывать этот интерфейс.
-typedef struct AbstractProductA {} case{} AbstractProductA;
+typedef struct AbstractProductA {} case {} AbstractProductA;
 
 char* UsefulFunctionA<AbstractProductA* p>() {return NULL;} //= 0;
 
 // Конкретные продукты создаются соответствующими Конкретными Фабриками.
 // Дополнительно представлены специализации конкретных продуктов
-typedef struct ConcreteProductA1 {} case{} ConcreteProductA1;
+typedef struct ConcreteProductA1 {} case {} ConcreteProductA1;
 AbstractProductA + {ConcreteProductA1 ConcreteProductA1;};
 
 char* UsefulFunctionA<AbstractProductA.ConcreteProductA1* p>() {
     return "The result of the product A1.";
 }
 
-typedef struct ConcreteProductA2 {} case{} ConcreteProductA2;
+typedef struct ConcreteProductA2 {} case {} ConcreteProductA2;
 AbstractProductA + {ConcreteProductA2 ConcreteProductA2;};
 
 char* UsefulFunctionA<AbstractProductA.ConcreteProductA2* p>() {
@@ -27,7 +27,7 @@ char* UsefulFunctionA<AbstractProductA.ConcreteProductA2* p>() {
 // Базовый интерфейс другого продукта. Все продукты могут взаимодействовать друг
 // с другом, но правильное взаимодействие возможно только между продуктами одной
 // и той же конкретной вариации.
-typedef struct AbstractProductB {} case{} AbstractProductB;
+typedef struct AbstractProductB {} case {} AbstractProductB;
 
 // Продукт B способен работать самостоятельно...
 char* UsefulFunctionB<AbstractProductB* p>() {return NULL;} //= 0;
@@ -79,11 +79,12 @@ void AnotherUsefulFunctionB<AbstractProductB.ConcreteProductB2* p>
 // темой или концепцией высокого уровня. Продукты одного семейства обычно могут
 // взаимодействовать между собой. Семейство продуктов может иметь несколько
 // вариаций, но продукты одной вариации несовместимы с продуктами другой.
-typedef struct AbstractFactory {} case{} AbstractFactory;
+typedef struct AbstractFactory {} enum {} AbstractFactory;
 
 AbstractProductA *CreateProductA<AbstractFactory* f>() {return NULL;} //= 0;
 AbstractProductB *CreateProductB<AbstractFactory* f>() {return NULL;} //= 0;
 
+//------------------------------------------------------------------------------
 // Конкретная Фабрика производит семейство продуктов одной вариации. Фабрика
 // гарантирует совместимость полученных продуктов. Обратите внимание, что
 // сигнатуры методов Конкретной Фабрики возвращают абстрактный продукт, в то
@@ -91,10 +92,7 @@ AbstractProductB *CreateProductB<AbstractFactory* f>() {return NULL;} //= 0;
 
 // Конкретные фабрики можно заменить на расширяемый перечислимый тип,
 // так как они содержат только интерфейс, выносимый в ППП наружу!!!
-
-//!!! typedef struct ConcreteFactory1 {} ConcreteFactory1;
-//!!! AbstractFactory + < ConcreteFactory1; >;
-AbstractFactory + {void ConcreteFactory1;};
+AbstractFactory + {ConcreteFactory1};
 
 AbstractProductA *CreateProductA<AbstractFactory.ConcreteFactory1* f>() {
     return create_spec(AbstractProductA.ConcreteProductA1);
@@ -104,9 +102,7 @@ AbstractProductB *CreateProductB<AbstractFactory.ConcreteFactory1* f>() {
 }
 
 // Каждая Конкретная Фабрика имеет соответствующую вариацию продукта.
-//!!! typedef struct ConcreteFactory2 {} ConcreteFactory2;
-//!!! AbstractFactory + < ConcreteFactory2; >;
-AbstractFactory + {void ConcreteFactory2;};
+AbstractFactory + {ConcreteFactory2};
 
 AbstractProductA *CreateProductA<AbstractFactory.ConcreteFactory2* f>() {
   return create_spec(AbstractProductA.ConcreteProductA2);
@@ -115,6 +111,7 @@ AbstractProductB *CreateProductB<AbstractFactory.ConcreteFactory2* f>() {
   return create_spec(AbstractProductB.ConcreteProductB2);
 }
 
+//------------------------------------------------------------------------------
 // Клиентский код работает с фабриками и продуктами только через абстрактные
 // типы: Абстрактная Фабрика и Абстрактный Продукт. Это позволяет передавать
 // любой подкласс фабрики или продукта клиентскому коду, не нарушая его.
@@ -129,6 +126,7 @@ void ClientCode(AbstractFactory *factory) {
   free(product_b);
 }
 
+//------------------------------------------------------------------------------
 int main() {
   printf("Client: Testing client code with the first factory type:\n");
   AbstractFactory *f1 = create_spec(AbstractFactory.ConcreteFactory1);

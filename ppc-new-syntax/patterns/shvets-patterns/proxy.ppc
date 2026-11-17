@@ -4,7 +4,7 @@
 // Интерфейс Субъекта объявляет общие операции как для Реального Субъекта, так и
 // для Заместителя. Пока клиент работает с Реальным Субъектом, используя этот
 // интерфейс, вы сможете передать ему заместителя вместо реального субъекта.
-typedef struct Subject {} case{} Subject;
+typedef struct Subject {} case {} Subject;
 
 void Request<Subject* s>() = 0;
 
@@ -13,7 +13,7 @@ void Request<Subject* s>() = 0;
 // тому же может быть очень медленной или точной – например, коррекция входных
 // данных. Заместитель может решить эти задачи без каких-либо изменений в коде
 // Реального Субъекта.
-typedef struct RealSubject {} case{} RealSubject;
+typedef struct RealSubject {} case {} RealSubject;
 Subject + {RealSubject RealSubject;};
 
 void Request<Subject.RealSubject* s>() {
@@ -45,9 +45,9 @@ void ProxyInit(Proxy* p, Subject.RealSubject *real_subject) {
 // т.д. Заместитель может выполнить одну из этих задач, а затем, в зависимости
 // от результата, передать выполнение одноимённому методу в связанном объекте
 // класса Реального Субъект.
-void Request<struct Subject.Proxy* s>() {
+void Request<Subject.Proxy* s>() {
   if (CheckAccess(&(s->Proxy))) {
-    Request<(Subject*)(s->Proxy.real_subject)>();
+    Request<(s->Proxy.real_subject)>();
     LogAccess(&(s->Proxy));
   }
 }
@@ -66,13 +66,13 @@ void ClientCode(Subject* subject) {
 
 int main() {
   printf("Client: Executing the client code with a real subject:\n");
-  struct Subject.RealSubject* real_subject = create_spec(Subject.RealSubject);
-  ClientCode((Subject*)real_subject);
+  Subject.RealSubject* real_subject = create_spec(Subject.RealSubject);
+  ClientCode(real_subject);
   printf("\n");
   printf("Client: Executing the same client code with a proxy:\n");
-  struct Subject.Proxy* proxy = create_spec(Subject.Proxy);
+  Subject.Proxy* proxy = create_spec(Subject.Proxy);
   ProxyInit(&(proxy->Proxy), real_subject);
-  ClientCode((Subject*)proxy);
+  ClientCode(proxy);
 
   free(real_subject);
   free(proxy);

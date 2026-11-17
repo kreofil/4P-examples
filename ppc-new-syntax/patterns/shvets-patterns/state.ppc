@@ -11,7 +11,7 @@ typedef struct Context Context;
 typedef struct State {
   Context *context;
   char* name;
-} case{} State;
+} enum {} State;
 
 void SetStateContext(State* state, Context *context) {
   state->context = context;
@@ -58,8 +58,8 @@ void Request2(Context* context) {
 
 // Конкретные Состояния реализуют различные модели поведения, связанные с
 // состоянием Контекста.
-State + {void ConcreteStateA;};
-State + {void ConcreteStateB;};
+State + {ConcreteStateA};
+State + {ConcreteStateB};
 
 void Handle1<State.ConcreteStateA* state>() {
   printf("ConcreteStateA handles request1.\n");

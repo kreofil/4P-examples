@@ -6,7 +6,7 @@
 
 // Интерфейс Снимка предоставляет способ извлечения метаданных снимка, таких как
 // дата создания или название. Однако он не раскрывает состояние Создателя.
-typedef struct Memento {} case{} Memento;
+typedef struct Memento {} case {} Memento;
 
 char* GetName<Memento* m>(char* str) {return NULL;} //= 0;
 char* Date<Memento* m>() {return NULL;} //= 0;

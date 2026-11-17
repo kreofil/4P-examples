@@ -19,7 +19,7 @@ typedef enum Type {
 typedef struct Prototype {
   char prototypeName[256];
   float prototypeField;
-} case{} Prototype;
+} case {} Prototype;
 
 void PrototypeSetName(Prototype* p, char* prototypeName) {
   strcpy(p->prototypeName, prototypeName);
@@ -53,7 +53,7 @@ Prototype + {ConcretePrototype1 ConcretePrototype1;};
 void ConcretePrototype1Set(struct Prototype.ConcretePrototype1* p,
                            char* prototypeName,
                            float concretePrototypeField) {
-  PrototypeSetName((Prototype*)p, prototypeName);
+  PrototypeSetName(p, prototypeName);
   p->ConcretePrototype1.concretePrototypeField1 = concretePrototypeField;
 }
 
@@ -65,14 +65,16 @@ Prototype* Clone<Prototype.ConcretePrototype1* p>() {
   struct Prototype.ConcretePrototype1* tmp =
                   create_spec(Prototype.ConcretePrototype1);
   // Копирующего конструктора нет. Поэтому приходится явно
-  ConcretePrototype1Set(tmp, p->prototypeName, p->ConcretePrototype1.concretePrototypeField1);
-  return (Prototype*)tmp;
+  ConcretePrototype1Set(tmp, p->prototypeName,
+                        p->ConcretePrototype1.concretePrototypeField1);
+  return tmp;
 }
 
 // Вывод информации о конкретном прототипе 1
 void PrototypePrint<Prototype.ConcretePrototype1* p>() {
   printf("ConcretePrototype1: name = %s, common field = %f, spec field = %f\n",
-         p->prototypeName, p->prototypeField, p->ConcretePrototype1.concretePrototypeField1);
+         p->prototypeName, p->prototypeField,
+         p->ConcretePrototype1.concretePrototypeField1);
 }
 
 typedef struct ConcretePrototype2 {
@@ -80,10 +82,10 @@ typedef struct ConcretePrototype2 {
 } ConcretePrototype2;
 Prototype + {ConcretePrototype2 ConcretePrototype2;};
 
-void ConcretePrototype2Set(struct Prototype.ConcretePrototype2* p,
+void ConcretePrototype2Set(Prototype.ConcretePrototype2* p,
                            char* prototypeName,
                            float concretePrototypeField) {
-  PrototypeSetName((Prototype*)p, prototypeName);
+  PrototypeSetName(p, prototypeName);
   p->ConcretePrototype2.concretePrototypeField2 = concretePrototypeField;
 }
 
@@ -91,14 +93,16 @@ Prototype* Clone<Prototype.ConcretePrototype2* p>() {
   struct Prototype.ConcretePrototype2* tmp =
                   create_spec(Prototype.ConcretePrototype2);
   // Копирующего конструктора нет. Поэтому приходится явно
-  ConcretePrototype2Set(tmp, p->prototypeName, p->ConcretePrototype2.concretePrototypeField2);
-  return (Prototype*)tmp;
+  ConcretePrototype2Set(tmp, p->prototypeName,
+                        p->ConcretePrototype2.concretePrototypeField2);
+  return tmp;
 }
 
 // Вывод информации о конкретном прототипе 1
 void PrototypePrint<Prototype.ConcretePrototype2* p>() {
   printf("ConcretePrototype2: name = %s, common field = %f, spec field = %f\n",
-         p->prototypeName, p->prototypeField, p->ConcretePrototype2.concretePrototypeField2);
+         p->prototypeName, p->prototypeField,
+         p->ConcretePrototype2.concretePrototypeField2);
 }
 
 // In PrototypeFactory you have two concrete prototypes, one for each concrete
@@ -109,14 +113,14 @@ typedef struct PrototypeFactory {
 } PrototypeFactory;
 
 void PrototypeFactorySet(PrototypeFactory* pf) {
-  struct Prototype.ConcretePrototype1* cp1 =
+  Prototype.ConcretePrototype1* cp1 =
           create_spec(Prototype.ConcretePrototype1);
   ConcretePrototype1Set(cp1, "PROTOTYPE_1", 50.f);
-  pf->prototypes[PROTOTYPE_1] = (Prototype*)cp1;
-  struct Prototype.ConcretePrototype2* cp2 =
+  pf->prototypes[PROTOTYPE_1] = cp1;
+  Prototype.ConcretePrototype2* cp2 =
           create_spec(Prototype.ConcretePrototype1);
   ConcretePrototype2Set(cp2, "PROTOTYPE_2", 60.f);
-  pf->prototypes[PROTOTYPE_2] = (Prototype*)cp2;
+  pf->prototypes[PROTOTYPE_2] = cp2;
 }
 
 // Be carefull of free all memory allocated. Again, if you have smart pointers

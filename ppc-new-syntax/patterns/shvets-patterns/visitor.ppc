@@ -19,7 +19,7 @@ char* SpecialMethodOfConcreteComponentB(ConcreteComponentB* с) {
   return "B";
 }
 
-typedef struct Visitor {} case {} Visitor;
+typedef struct Visitor {} enum {} Visitor;
 void VisitConcreteComponentA<Visitor* v>(const ConcreteComponentA *с) = 0;
 void VisitConcreteComponentB<Visitor* v>(const ConcreteComponentB *с) = 0;
 
@@ -48,7 +48,7 @@ void Accept<Component.ConcreteComponentB* с>(Visitor *v) {
 // сложной структурой объектов, такой как дерево Компоновщика. В этом случае
 // было бы полезно хранить некоторое промежуточное состояние алгоритма при
 // выполнении методов посетителя над различными объектами структуры.
-Visitor + {void ConcreteVisitor1;};
+Visitor + {ConcreteVisitor1};
 void VisitConcreteComponentA<Visitor.ConcreteVisitor1* v>(ConcreteComponentA *c) {
   char* str = ExclusiveMethodOfConcreteComponentA(c);
   printf("%s + ConcreteVisitor1\n", str);
@@ -58,7 +58,7 @@ void VisitConcreteComponentB<Visitor.ConcreteVisitor1* v>(ConcreteComponentB *c)
   printf("%s + ConcreteVisitor1\n", str);
 }
 
-Visitor + {void ConcreteVisitor2;};
+Visitor + {ConcreteVisitor2};
 void VisitConcreteComponentA<Visitor.ConcreteVisitor2* v>(ConcreteComponentA *c) {
   char* str = ExclusiveMethodOfConcreteComponentA(c);
   printf("%s + ConcreteVisitor2\n", str);

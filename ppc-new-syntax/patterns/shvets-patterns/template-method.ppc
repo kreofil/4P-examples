@@ -6,7 +6,7 @@
 // алгоритма, состоящего из вызовов (обычно) абстрактных примитивных операций.
 // Конкретные подклассы должны реализовать эти операции, но оставить сам
 // шаблонный метод без изменений.
-typedef struct AbstractClass {} case{} AbstractClass;
+typedef struct AbstractClass {} case {} AbstractClass;
 
 // Эти операции уже имеют реализации.
 void BaseOperation1(AbstractClass* ac) {
@@ -80,15 +80,15 @@ void ClientCode(AbstractClass *class) {
 
 int main() {
   printf("Same client code can work with different subclasses:\n");
-  struct AbstractClass.ConcreteClass1 *concreteClass1
+  AbstractClass.ConcreteClass1 *concreteClass1
                 = create_spec(AbstractClass.ConcreteClass1);
-  ClientCode((AbstractClass*)concreteClass1);
+  ClientCode(concreteClass1);
   printf("\n");
 
   printf("Same client code can work with different subclasses:\n");
-  struct AbstractClass.ConcreteClass2 *concreteClass2
+  AbstractClass.ConcreteClass2 *concreteClass2
                 = create_spec(AbstractClass.ConcreteClass2);
-  ClientCode((AbstractClass*)concreteClass2);
+  ClientCode(concreteClass2);
 
   free(concreteClass1);
   free(concreteClass2);

@@ -35,7 +35,7 @@ typedef struct List {
 typedef struct Subject {
   List listObserver;
   char message[256];
-} case{} Subject;
+} case {} Subject;
 
 // Наблюдатель может устанавливать связь с конкретным субъектом
 // для получения его текущего состояния
@@ -43,7 +43,7 @@ typedef struct Observer {
   Subject *subject;
   char messageFromSubject[256];
   int number;
-} case{} Observer;
+} case {} Observer;
 // Число созданных наблюдателей
 static int observerStaticNumber = 0;
 

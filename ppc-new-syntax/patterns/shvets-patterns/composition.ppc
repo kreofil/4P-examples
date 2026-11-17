@@ -7,7 +7,7 @@
 typedef struct Component Component;
 typedef struct Component {
   Component *parent;
-} case{} Component;
+} case {} Component;
 
 // Список для наблюдателей. Создается как замена класса list
 // Элемент списка
@@ -144,7 +144,7 @@ void CompositeInit(Composite* composite) {
 // компонентов, так и удалять их, как простые, так и сложные.
 void Add<Component.Composite* self>(Component *component) {
   ListPushBack(&(self->Composite.children), component);
-  SetParent(component, (Component*)self);
+  SetParent(component, self);
 }
 
 // Have in mind that this method removes the pointer to the list but doesn't
@@ -231,32 +231,32 @@ int main() {
   printf("\n\n");
 
   // ...а также сложные контейнеры.
-  struct Component.Composite *tree = create_spec(Component.Composite);
+  Component.Composite *tree = create_spec(Component.Composite);
   CompositeInit(&(tree->Composite));
-  struct Component.Composite *branch1 = create_spec(Component.Composite);
+  Component.Composite *branch1 = create_spec(Component.Composite);
   CompositeInit(&(branch1->Composite));
 
   Component *leaf_1 = create_spec(Component.Leaf);
   Component *leaf_2 = create_spec(Component.Leaf);
   Component *leaf_3 = create_spec(Component.Leaf);
-  Add<(Component*)branch1>(leaf_1);
-  Add<(Component*)branch1>(leaf_2);
+  Add<branch1>(leaf_1);
+  Add<branch1>(leaf_2);
 
-  struct Component.Composite *branch2 = create_spec(Component.Composite);
+  Component.Composite *branch2 = create_spec(Component.Composite);
   CompositeInit(&(branch2->Composite));
-  Add<(Component*)branch2>(leaf_3);
-  Add<(Component*)tree>((Component*)branch1);
-  Add<(Component*)tree>((Component*)branch2);
+  Add<branch2>(leaf_3);
+  Add<tree>(branch1);
+  Add<tree>(branch2);
 
   printf("Client: Now I've got a composite tree:\n");
-  ClientCode((Component*)tree);
+  ClientCode(tree);
   printf("\n\n");
-  // ComponentPrint<(Component*)tree>();
+  // ComponentPrint<tree>();
   // printf("\n\n");
 
   printf("Client: I don't need to check the components "
          "classes even when managing the tree:\n");
-  ClientCode2((Component*)tree, simple);
+  ClientCode2(tree, simple);
   printf("\n");
 
   free(simple);

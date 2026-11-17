@@ -31,6 +31,7 @@ Animal* NewAnimal(Creator* c) {
 // вид животного.
 // typedef struct DuckCreator {} DuckCreator;
 Creator + {duckCreator};
+
 // Сигнатура метода по-прежнему использует тип обобщенного животного,
 // хотя фактически из функции возвращается конкретное животное.
 // Создатель независит от конкретных видов животных.
@@ -45,6 +46,7 @@ Animal* FactoryMethod<Creator.dogCreator* p>() {
   return create_spec(Animal.dog);
 }
 
+//------------------------------------------------------------------------------
 // Клиентский код работает с экземпляром конкретного создателя через его
 // базовый интерфейс. Пока клиент продолжает работать с создателем можно
 // передать ему любую специализацию.
@@ -77,12 +79,12 @@ int main() {
   printf("\n");
   printf("Step 3: Launched with the DuckCreator.\n");
   Creator.duckCreator creator3;
-  ClientCode((Creator*)&creator3);
+  ClientCode(&creator3);
 
   printf("\n");
   printf("Step 4: Launched with the DogCreator.\n");
   Creator.dogCreator creator4;
-  ClientCode((Creator*)&creator4);
+  ClientCode(&creator4);
 
   return 0;
 }

@@ -15,16 +15,16 @@ char* SpecialMethodOfConcreteComponentB(ConcreteComponentB* с) {
   return "B";
 }
 
-typedef struct Component {} case{} Component;
+typedef struct Component {} case {} Component;
 Component + {ConcreteComponentA ConcreteComponentA;};
 Component + {ConcreteComponentB ConcreteComponentB;};
 
-typedef struct Visitor {} case{} Visitor;
+typedef struct Visitor {} enum {} Visitor;
 // Посетитель и компонент образуют мультиметод
 void VisitComponent<Visitor* v, Component *с>() = 0;
 
-Visitor + {void ConcreteVisitor1;};
-Visitor + {void ConcreteVisitor2;};
+Visitor + {ConcreteVisitor1};
+Visitor + {ConcreteVisitor2};
 
 void VisitComponent
       <Visitor.ConcreteVisitor1* v, Component.ConcreteComponentA *c>() {

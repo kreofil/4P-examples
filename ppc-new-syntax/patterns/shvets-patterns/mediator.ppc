@@ -7,7 +7,7 @@
 // уведомления посредника о различных событиях. Посредник может реагировать на
 // эти события и передавать исполнение другим компонентам.
 typedef struct BaseComponent BaseComponent;
-typedef struct Mediator {} case{} Mediator;
+typedef struct Mediator {} case {} Mediator;
 
 void Notify<Mediator* m>(BaseComponent *sender, char* event) {
   printf("Error: Abstract Notify\n");
@@ -19,7 +19,7 @@ void Notify<Mediator* m>(BaseComponent *sender, char* event) {
 // посредника внутри объектов компонентов.
 typedef struct BaseComponent {
   Mediator *mediator;
-} case{} BaseComponent;
+} case {} BaseComponent;
 
 // void BaseComponentInit(BaseComponent* bc; Mediator *mediator) {
 //   bc->mediator = mediator;
@@ -37,12 +37,12 @@ BaseComponent + {Component1 Component1;};
 
 void DoA(struct BaseComponent.Component1* c) {
   printf("Component 1 does A.\n");
-  Notify<c->mediator>((BaseComponent*)c, "A");
+  Notify<c->mediator>(c, "A");
 }
 
 void DoB(struct BaseComponent.Component1* c) {
   printf("Component 1 does B.\n");
-  Notify<c->mediator>((BaseComponent*)c, "B");
+  Notify<c->mediator>(c, "B");
 }
 
 typedef struct Component2 {} Component2;
@@ -50,12 +50,12 @@ BaseComponent + {Component2 Component2;};
 
 void DoC(struct BaseComponent.Component2* c) {
   printf("Component 2 does C.\n");
-  Notify<c->mediator>((BaseComponent*)c, "C");
+  Notify<c->mediator>(c, "C");
 }
 
 void DoD(struct BaseComponent.Component2* c) {
   printf("Component 2 does D.\n");
-  Notify<c->mediator>((BaseComponent*)c, "D");
+  Notify<c->mediator>(c, "D");
 }
 
 // Конкретные Посредники реализуют совместное поведение,
@@ -71,8 +71,8 @@ void ConcreteMediatorInit(struct Mediator.ConcreteMediator* cm,
                           BaseComponent.Component2 *c2) {
   cm->ConcreteMediator.component1 = c1;
   cm->ConcreteMediator.component2 = c2;
-  SetMediator((BaseComponent*)cm->ConcreteMediator.component1, (Mediator*)cm);
-  SetMediator((BaseComponent*)cm->ConcreteMediator.component2, (Mediator*)cm);
+  SetMediator(cm->ConcreteMediator.component1, cm);
+  SetMediator(cm->ConcreteMediator.component2, cm);
 }
 
 void Notify<Mediator.ConcreteMediator* c>(BaseComponent *sender, char* event) {
@@ -89,11 +89,11 @@ void Notify<Mediator.ConcreteMediator* c>(BaseComponent *sender, char* event) {
 
 // Клиентский код.
 void ClientCode() {
-  struct BaseComponent.Component1 *c1 = create_spec(BaseComponent.Component1);
-  struct BaseComponent.Component2 *c2 = create_spec(BaseComponent.Component2);
-  struct Mediator.ConcreteMediator *mediator = create_spec(Mediator.ConcreteMediator);
-  SetMediator((BaseComponent*)c1, (Mediator*)mediator);
-  SetMediator((BaseComponent*)c2, (Mediator*)mediator);
+  BaseComponent.Component1 *c1 = create_spec(BaseComponent.Component1);
+  BaseComponent.Component2 *c2 = create_spec(BaseComponent.Component2);
+  Mediator.ConcreteMediator *mediator = create_spec(Mediator.ConcreteMediator);
+  SetMediator(c1, mediator);
+  SetMediator(c2, mediator);
   ConcreteMediatorInit(mediator, c1, c2);
   printf("Client triggers operation A.\n");
   DoA(c1);

@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 // Базовый интерфейс Компонента определяет поведение, которое изменяется
 // декораторами.
-typedef struct Component {} case{} Component;
+typedef struct Component {} case {} Component;
 void Operation<Component* c>(char* buf) {} //= 0;
 
 // Конкретные Компоненты предоставляют реализации поведения по умолчанию. Может
@@ -22,7 +22,7 @@ void Operation<Component.ConcreteComponent* c>(char* buf) {
 // Основная его цель  - определить интерфейс обёртки для всех конкретных
 // декораторов. Реализация кода обёртки по умолчанию может включать в себя поле
 // для хранения завёрнутого компонента и средства его инициализации.
-typedef struct Decorator {Component* component;} case{} Decorator;
+typedef struct Decorator {Component* component;} case {} Decorator;
 
 // Функция, обобщающая обработку операции в декораторах
 void DecoratorOperation<Decorator* d>(char* buf) {}
@@ -108,18 +108,18 @@ int main() {
 
   // Обратите внимание, что декораторы могут обёртывать не только простые
   // компоненты, но и другие декораторы.
-  struct Component.Decorator* decorator1
+  Component.Decorator* decorator1
          = create_spec(Component.Decorator.ConcreteDecoratorA);
   DecoratorInit((Decorator*)&(decorator1->Decorator), simple);
   printf("Client: I've got a decoratorA-simple component:\n");
-  ClientCode((Component*)decorator1);
+  ClientCode(decorator1);
   printf("\n");
 
-  struct Component.Decorator* decorator2
+  Component.Decorator* decorator2
          = create_spec(Component.Decorator.ConcreteDecoratorB);
-  DecoratorInit((Decorator*)&(decorator2->Decorator), (Component*)decorator1);
+  DecoratorInit((Decorator*)&(decorator2->Decorator), decorator1);
   printf("Client: Now I've got a decoratorB-decoratorA-simple component:\n");
-  ClientCode((Component*)decorator2);
+  ClientCode(decorator2);
   printf("\n");
 
   free(simple);

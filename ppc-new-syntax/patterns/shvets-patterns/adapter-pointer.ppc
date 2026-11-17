@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 // Целевой класс объявляет интерфейс, с которым может работать клиентский код.
-typedef struct Target {} case{} Target;
+typedef struct Target {} case {} Target;
 
 void Request<Target* t>(char* str){
     strcpy(str, "Target: The default target's behavior.");
@@ -42,7 +42,7 @@ void Request<Target.Adapter* t>(char* str) {
     strcat(str, to_reverse);
 }
 
-void AdapterAttach(struct Target.Adapter* target, Adaptee *adaptee) {
+void AdapterAttach(Target.Adapter* target, Adaptee *adaptee) {
     target->Adapter = adaptee;
 }
 
@@ -64,9 +64,9 @@ int main() {
     printf("Adaptee: %s", SpecificRequest(adaptee));
     printf("\n\n");
     printf("Client: But I can work with it via the Adapter(Adaptee):\n");
-    struct Target.Adapter *adapter = create_spec(Target.Adapter);
+    Target.Adapter *adapter = create_spec(Target.Adapter);
     AdapterAttach(adapter, adaptee);
-    ClientCode((Target*)adapter);
+    ClientCode(adapter);
     printf("\n");
 
     free(target);

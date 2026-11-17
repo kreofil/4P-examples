@@ -1,14 +1,13 @@
-// Компилировать: ppclang -xc strategy.ppc -o strategy
 #include <stdio.h>
 
 // Обобщенная стратегия
-typedef struct Strategy {} case{} Strategy;
+typedef struct Strategy {} enum {} Strategy;
 // Обобщающая функция, определяющая общую сигнатуру для алгоритмов
 void Action<Strategy* s>(char* name, int age) = 0;
-
 // Конкретные стратегии задаются перечислимыми типом
-Strategy + {void nameAge;};
-Strategy + {void ageName;};
+Strategy + {nameAge};
+Strategy + {ageName};
+
 // Обработчики специализаций, определяемые конкрентным стратегиями.
 void Action<Strategy.nameAge* s>(char* name, int age) {
   printf("Name is %s, age = %d", name, age);
@@ -22,7 +21,8 @@ typedef struct Animal {
   Strategy* strategy;
   char* name;
   int age;
-} case{} Animal;
+} case {} Animal;
+
 void GetInfo<Animal* a>() = 0;
 // Начальная инициализация вместо отсутствующего конструктора.
 void InitAnimal(Animal* a, char* name, int age) {
@@ -64,22 +64,22 @@ void ClientCode(Animal* a) {
 }
 
 int main() {
-  struct Strategy.nameAge nas;
-  struct Strategy.ageName ans;
+  Strategy.nameAge nas;
+  Strategy.ageName ans;
 
-  struct Animal.duck duck;
-  InitAnimal((Animal*)&duck, "Grey Neck", 2);
-  SetStrategy((Animal*)&duck, (Strategy*)&nas);
-  ClientCode((Animal*)&duck);
-  SetStrategy((Animal*)&duck, (Strategy*)&ans);
-  ClientCode((Animal*)&duck);
+  Animal.duck duck;
+  InitAnimal(&duck, "Grey Neck", 2);
+  SetStrategy(&duck, &nas);
+  ClientCode(&duck);
+  SetStrategy(&duck, &ans);
+  ClientCode(&duck);
 
-  struct Animal.dog  dog;
-  InitAnimal((Animal*)&dog, "Rex", 5);
-  SetStrategy((Animal*)&dog, (Strategy*)&nas);
-  ClientCode((Animal*)&dog);
-  SetStrategy((Animal*)&dog, (Strategy*)&ans);
-  ClientCode((Animal*)&dog);
+  Animal.dog  dog;
+  InitAnimal(&dog, "Rex", 5);
+  SetStrategy(&dog, &nas);
+  ClientCode(&dog);
+  SetStrategy(&dog, &ans);
+  ClientCode(&dog);
 
   return 0;
 }

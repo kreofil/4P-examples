@@ -1,12 +1,12 @@
 # set minimum cmake version
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
+
+set(CMAKE_C_COMPILER ppchibicc CACHE FILEPATH "Компилятор C")
+
 project(evo-demo)    # Название проекта
 
-# SET(CMAKE_C_COMPILER "/home/al/@ToDo/pp-chibicc/chibicc-ppc/chibicc")
-# SET(CMAKE_C_COMPILER ppclang)
-SET(CMAKE_C_COMPILER "ppchibicc")
-
-set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type is Debug" FORCE)
+# set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type is Debug" FORCE)
+set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type is Release" FORCE)
 
 set(BUILD_DIR "${CMAKE_BINARY_DIR}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_DIR}/../bin")
@@ -45,3 +45,7 @@ set(SOURCE_FILES
 )
 
 add_executable(evo-demo ${SOURCE_FILES})
+
+# Основной режим компиляции: LLVM с уровнем O2.
+target_compile_options(evo-demo PRIVATE --backend=llvm -O2)
+target_link_options(evo-demo PRIVATE --backend=llvm)

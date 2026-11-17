@@ -8,13 +8,14 @@
 // совершенно разными. Как правило, интерфейс Реализации предоставляет только
 // примитивные операции, в то время как Абстракция определяет операции более
 // высокого уровня, основанные на этих примитивах.
-typedef struct Implementation {} case{} Implementation;
+typedef struct Implementation {} case {} Implementation;
 char* OperationImplementation<Implementation* i>() {return NULL;} //= 0;
 
 // Каждая Конкретная Реализация соответствует определённой платформе и реализует
 // интерфейс Реализации с использованием API этой платформы.
 typedef struct ConcreteImplementationA {} ConcreteImplementationA;
 Implementation + {ConcreteImplementationA ConcreteImplementationA;};
+
 char* OperationImplementation<Implementation.ConcreteImplementationA* i>() {
   return "ConcreteImplementationA: Here's the result on the platform A.\n";
 }

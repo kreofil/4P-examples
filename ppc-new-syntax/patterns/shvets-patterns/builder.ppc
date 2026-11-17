@@ -28,7 +28,7 @@ void ListParts(Product1* p) {
 
 // Интерфейс Строителя объявляет создающие методы для различных частей объектов
 // Продуктов.
-typedef struct Builder{} case{} Builder;
+typedef struct Builder{} case {} Builder;
 
 void ProducePartA<Builder* b>() {} //=0;
 void ProducePartB<Builder* b>() {} //=0;
@@ -131,7 +131,7 @@ void BuildFullFeaturedProduct(Director* d){
 // I used raw pointers for simplicity however you may prefer to use smart
 // pointers here
 void ClientCode(Director* director) {
-    struct Builder.ConcreteBuilder1* builder = create_spec(Builder.ConcreteBuilder1);
+    Builder.ConcreteBuilder1* builder = create_spec(Builder.ConcreteBuilder1);
     Reset(&(builder->ConcreteBuilder1));
 
     SetBuilder(director, (Builder*)builder);

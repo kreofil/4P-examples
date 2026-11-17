@@ -5,7 +5,7 @@
 
 // Интерфейс Продукта объявляет операции, которые должны выполнять все
 // конкретные продукты.
-typedef struct Product {} case{} Product;
+typedef struct Product {} case {} Product;
 
 char* Operation<Product* p>() {return NULL;} // = 0;
 
@@ -26,7 +26,7 @@ char* Operation<Product.ConcreteProduct2* p>() {
 
 // Эвоюционно расширяемый перечислимый тип, обеспечивающий полиморфный выбор
 // функции создания продукта.
-typedef struct Creator {} case{} Creator;
+typedef struct Creator {} case {} Creator;
 // Обратите внимание, что Создатель может также обеспечить реализацию
 // фабричного метода по умолчанию.
 Product* FactoryMethod<Creator* c>() {return NULL;} // = 0;

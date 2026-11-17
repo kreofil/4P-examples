@@ -1,4 +1,3 @@
-// Компилировать: ppclang -xc template-method.ppc -o template-method
 #include <stdio.h>
 
 //------------------------------------------------------------------------------
@@ -6,7 +5,7 @@
 typedef struct Animal {
   const char* name;
   int age;
-} case{} Animal;
+} case {} Animal;
 
 // Начальная инициализация вместо отсутствующего конструктора.
 void InitAnimal(Animal* a, const char* name, int age) {
@@ -77,11 +76,13 @@ void Action<Animal.dog* a>() {
   printf("My job is to protect the house from burglars.\n");
 };
 
+//------------------------------------------------------------------------------
 // Клиент использует шаблонный метод через указатель на обобщение
 void ClientCode(Animal* a) {
   Behavior(a);
 }
 
+//------------------------------------------------------------------------------
 int main() {
   Animal.rooster rooster;
   InitAnimal(&rooster, "Petya", 2);

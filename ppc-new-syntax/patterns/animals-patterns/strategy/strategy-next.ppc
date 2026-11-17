@@ -1,8 +1,7 @@
-// Компилировать: ppclang -xc strategy-next.ppc -o strategy-next
 #include <stdio.h>
 
 // Обобщенная стратегия
-typedef struct Strategy {struct Strategy* nextStrategy;} case{} Strategy;
+typedef struct Strategy {struct Strategy* nextStrategy;} enum {} Strategy;
 // Обобщающая функция, определяющая общую сигнатуру для алгоритмов
 void Action<Strategy* s>(char* name, int age) = 0;
 // Начальная инициализация стратегии
@@ -11,25 +10,25 @@ void InitStrategy(Strategy* s) {s->nextStrategy = NULL;}
 void SetNextStrategy(Strategy* s, Strategy* ns) {s->nextStrategy = ns;}
 // Функция, осуществляющая переадресацию на дополнительную стратегию
 void NextAction(Strategy* s, char* name, int age) {
-  if((Strategy*)s->nextStrategy != NULL) {
+  if(s->nextStrategy != NULL) {
     printf("\n    ");
     Action<s->nextStrategy>(name, age);
   }
 }
 
 // Конкретные стратегии задаются перечислимыми типом
-Strategy + {void nameAge;};
-Strategy + {void ageName;};
+Strategy + {nameAge};
+Strategy + {ageName};
 // Обработчики специализаций, определяемые конкрентным стратегиями.
 void Action<Strategy.nameAge* s>(char* name, int age) {
   printf("Name is %s, age = %d", name, age);
   // Необязательное действие, если алгоритму не нужно
-  NextAction((Strategy*)s, name, age);
+  NextAction(s, name, age);
 }
 void Action<Strategy.ageName* s>(char* name, int age) {
   printf("Age = %d, name is %s", age, name);
   // Необязательное действие, если алгоритму не нужно
-  NextAction((Strategy*)s, name, age);
+  NextAction(s, name, age);
 }
 
 // Обобщенное животное
@@ -79,33 +78,34 @@ void ClientCode(Animal* a) {
   UseStrategy(a);
 }
 
+//------------------------------------------------------------------------------
 int main() {
-  struct Strategy.nameAge nas;
-  InitStrategy((Strategy*)&nas);
-  struct Strategy.ageName ans;
-  InitStrategy((Strategy*)&ans);
+  Strategy.nameAge nas;
+  InitStrategy(&nas);
+  Strategy.ageName ans;
+  InitStrategy(&ans);
 
-  struct Animal.duck duck;
-  InitAnimal((Animal*)&duck, "Grey Neck", 2);
-  SetStrategy((Animal*)&duck, (Strategy*)&nas);
-  ClientCode((Animal*)&duck);
-  SetStrategy((Animal*)&duck, (Strategy*)&ans);
-  ClientCode((Animal*)&duck);
+  Animal.duck duck;
+  InitAnimal(&duck, "Grey Neck", 2);
+  SetStrategy(&duck, &nas);
+  ClientCode(&duck);
+  SetStrategy(&duck, &ans);
+  ClientCode(&duck);
 
-  struct Animal.dog  dog;
-  InitAnimal((Animal*)&dog, "Rex", 5);
-  SetStrategy((Animal*)&dog, (Strategy*)&nas);
-  ClientCode((Animal*)&dog);
-  SetStrategy((Animal*)&dog, (Strategy*)&ans);
-  ClientCode((Animal*)&dog);
+  Animal.dog  dog;
+  InitAnimal(&dog, "Rex", 5);
+  SetStrategy(&dog, &nas);
+  ClientCode(&dog);
+  SetStrategy(&dog, &ans);
+  ClientCode(&dog);
 
-  struct Animal.duck newDuck;
-  InitAnimal((Animal*)&newDuck, "Black Cape", 4);
-  SetStrategy((Animal*)&newDuck, (Strategy*)&nas);
-  SetNextStrategy((Strategy*)&nas, (Strategy*)&ans);
-  ClientCode((Animal*)&newDuck);
-  SetStrategy((Animal*)&newDuck, (Strategy*)&ans);
-  ClientCode((Animal*)&newDuck);
+  Animal.duck newDuck;
+  InitAnimal(&newDuck, "Black Cape", 4);
+  SetStrategy(&newDuck, &nas);
+  SetNextStrategy(&nas, &ans);
+  ClientCode(&newDuck);
+  SetStrategy(&newDuck, &ans);
+  ClientCode(&newDuck);
 
   return 0;
 }

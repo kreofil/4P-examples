@@ -15,7 +15,7 @@
 // Выдается только текущее значение
 
 
-typedef struct Value {} case{} Value;          // Данные контейнера
+typedef struct Value {} case {} Value;          // Данные контейнера
 // Обобщенная функция вывода значения
 void OutValue<Value* value>() = 0;
 
@@ -251,31 +251,31 @@ void ClientCode() {
   }
 
   struct ContainerIterator.VectorIterator cit;
-  ContainerIteratorInit<(ContainerIterator*)&cit>((Container*)&cvec);
+  ContainerIteratorInit<&cit>((Container*)&cvec);
   // VectorIteratorFirst(&it);
   // printf("VectorIteratorFirst: %d\n", );
-  for (ContainerIteratorFirst<(ContainerIterator*)&cit>();
-       !ContainerIteratorIsDone<(ContainerIterator*)&cit>();
-        ContainerIteratorNext<(ContainerIterator*)&cit>()) {
+  for (ContainerIteratorFirst<&cit>();
+       !ContainerIteratorIsDone<&cit>();
+        ContainerIteratorNext<&cit>()) {
     // OutValue<vec.array[VectorIteratorCurrent(&it)]>();
-    Value* v = ContainerIteratorValue<(ContainerIterator*)&cit>();
+    Value* v = ContainerIteratorValue<&cit>();
     OutValue<v>();
     printf("\n");
   }
 
   printf("______________Container Iterator with custom Struct______________\n");
-  struct Container.Vector cvec2;
+  Container.Vector cvec2;
   VectorInit(&(cvec2.Vector));
   VectorAdd(&cvec2.Vector, (Value*)&a);
   VectorAdd(&cvec2.Vector, (Value*)&b);
   VectorAdd(&cvec2.Vector, (Value*)&c);
-  struct ContainerIterator.VectorIterator cit2;
-  ContainerIteratorInit<(ContainerIterator*)&cit2>((Container*)&cvec2);
-  for (ContainerIteratorFirst<(ContainerIterator*)&cit2>();
-       !ContainerIteratorIsDone<(ContainerIterator*)&cit2>();
-        ContainerIteratorNext<(ContainerIterator*)&cit2>()) {
+  ContainerIterator.VectorIterator cit2;
+  ContainerIteratorInit<&cit2>((Container*)&cvec2);
+  for (ContainerIteratorFirst<&cit2>();
+       !ContainerIteratorIsDone<&cit2>();
+        ContainerIteratorNext<&cit2>()) {
     // OutValue<vec2.array[VectorIteratorCurrent(&it2)]>();
-    Value* v = ContainerIteratorValue<(ContainerIterator*)&cit2>();
+    Value* v = ContainerIteratorValue<&cit2>();
     OutValue<v>();
     printf("\n");
   }

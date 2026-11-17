@@ -3,7 +3,7 @@
 #include <string.h>
 
 // Интерфейс Команды объявляет метод для выполнения команд.
-typedef struct Command {} case{} Command;
+typedef struct Command {} case {} Command;
 void Execute<Command* command>() = 0;
 
 // Некоторые команды способны выполнять простые операции самостоятельно.
@@ -71,8 +71,8 @@ void Execute<Command.ComplexCommand* c>() {
     DoSomethingElse(c->ComplexCommand.receiver, c->ComplexCommand.b);
 }
 
-// Отправитель связан с одной или несколькими командами. Он отправляет запрос
-// команде.
+// Отправитель связан с одной или несколькими командами.
+// Он отправляет запрос команде.
 typedef struct Invoker {
   Command *onStart;
   Command *onFinish;

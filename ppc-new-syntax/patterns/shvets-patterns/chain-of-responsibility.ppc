@@ -4,7 +4,7 @@
 
 // Поведение цепочки по умолчанию может быть реализовано внутри базового класса
 // обработчика.
-typedef struct Handler {struct Handler* next_handler;} case{} Handler;
+typedef struct Handler {struct Handler* next_handler;} case {} Handler;
 
 // Формирование цепочки обработчиков (однонаправленный линейный список)
 Handler* SetNext(Handler* h, Handler *handler) {
@@ -90,7 +90,6 @@ int main() {
   // SetNext(dog, NULL);
   // SetNext(squirrel, dog);
   // SetNext(monkey, squirrel);
-
   // Или по аналогии с: monkey->SetNext(squirrel)->SetNext(dog);
   SetNext(monkey,
           SetNext(squirrel,

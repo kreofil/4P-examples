@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+//------------------------------------------------------------------------------
 // Целевой класс объявляет интерфейс, с которым может работать клиентский код.
 typedef struct Target {} case{} Target;
 
@@ -9,6 +10,7 @@ void Request<Target* t>(char* str){
     strcpy(str, "Target: The default target's behavior.");
 }
 
+//------------------------------------------------------------------------------
 // Адаптируемый класс содержит некоторое полезное поведение, но его интерфейс
 // несовместим с существующим клиентским кодом. Адаптируемый класс нуждается в
 // некоторой доработке, прежде чем клиентский код сможет его использовать.
@@ -43,6 +45,7 @@ void Request<Target.Adaptee* t>(char* str) {
     strcat(str, to_reverse);
 }
 
+//------------------------------------------------------------------------------
 // Клиентский код поддерживает все классы, использующие целевой интерфейс.
 void ClientCode(Target *target) {
     char str[256];
@@ -50,6 +53,7 @@ void ClientCode(Target *target) {
     printf("%s", str);
 }
 
+//------------------------------------------------------------------------------
 int main() {
     printf("Client: I can work just fine with the Target objects:\n");
     Target *target = create_spec(Target);
@@ -61,7 +65,7 @@ int main() {
     printf("Adaptee: %s", SpecificRequest(adaptee));
     printf("\n\n");
     printf("Client: But I can work with it via the Adapter(Adaptee):\n");
-    struct Target.Adaptee *adapter = create_spec(Target.Adaptee);
+    Target.Adaptee *adapter = create_spec(Target.Adaptee);
     ClientCode((Target*)adapter);
     printf("\n");
 

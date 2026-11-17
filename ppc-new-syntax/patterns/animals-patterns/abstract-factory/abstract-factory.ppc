@@ -26,33 +26,26 @@ void ToyDogMessage() {printf("It is Toy dog.\n");}
 typedef struct Duck {} case {} Duck;
 void DuckMessage() {printf("Duck created! ");}
 // Специализации уток
-// Duck + {DomesticDuck domesticDuck;};
-// Duck + {ToyDuck toyDuck;};
-struct Duck + {DomesticDuck domesticDuck; ToyDuck toyDuck;};
+Duck + {DomesticDuck domesticDuck;};
+Duck + {ToyDuck toyDuck;};
 
 // Абстрактная собака, обобщающая разные семейства
 typedef struct Dog {} case{} Dog;
 void DogMessage() {printf("Dog created! ");}
 // Специализации собак
-// Dog + {DomesticDog domesticDog;};
-// Dog + {ToyDog toyDog;};
-Dog + {DomesticDog domesticDog; ToyDog toyDog;};
+Dog + {DomesticDog domesticDog;};
+Dog + {ToyDog toyDog;};
 
 //------------------------------------------------------------------------------
 // Обобщенная Абстрактная фабрика.
 // Задается эволюционно расширяемым перечислимым типом.
-// typedef struct AbstractFactory {} case{} AbstractFactory;
-// AbstractFactory + {void ForDomestic;};
-// AbstractFactory + {void ForToy;};
-typedef struct AbstractFactory {} enum {ForDomestic, ForToy} const AbstractFactory;
+typedef struct AbstractFactory {} enum {} AbstractFactory;
+AbstractFactory + {ForDomestic};
+AbstractFactory + {ForToy};
 
 //------------------------------------------------------------------------------
 // Обобщающая функция, определяющая интерфейс для создания одну из уток.
 Duck* CreateDuck<AbstractFactory* f>() = 0;
-// Duck* CreateDuck<AbstractFactory* f>() {
-//   printf("You need to define spec function\n");
-//   exit(33);
-// }
 //Обработчик, обеспечивающий создание домашней утки.
 Duck* CreateDuck<AbstractFactory.ForDomestic* f>() {
   Duck.domesticDuck* d = create_spec(Duck.domesticDuck);
@@ -70,7 +63,6 @@ Duck* CreateDuck<AbstractFactory.ForToy* f>() {
 
 //------------------------------------------------------------------------------
 // Обобщающая функция, определяющая интерфейс для создания одной из собак.
-// Dog* CreateDog<AbstractFactory* f>() {return NULL;} //= 0;
 Dog* CreateDog<AbstractFactory* f>() = 0; //{exit(42);}
 //Обработчик, обеспечивающий создание домашней собаки.
 Dog* CreateDog<AbstractFactory.ForDomestic* f>() {

@@ -13,8 +13,8 @@
 #include <string.h>
 
 
-_Bool S();
-_Bool Z();
+bool S();
+bool Z();
 
 char str[256];  // Строка с входной цепочкой, имитирующая входную ленту
 // string str; // Строка с входной цепочкой, имитирующая входную ленту
@@ -43,14 +43,14 @@ void GetOneLine(FILE *is, char* str) {
 //!!!! Это не работает!!! Но нужно.
 // typedef struct StateS{} case{void S1, S2, S3, True, False;} StateS;
 
-typedef struct StateS{} case{} StateS;
-StateS + {void S1, S2, S3, True, False;};
+typedef struct StateS{} enum {} StateS;
+StateS + {S1, S2, S3, True, False};
 
 //------------------------------------------------------------------------------
 // Обобщенная функция и обработчики, реализующие состояния автомата S
 
 // Обобщенная функция реализует начальное состояние
-_Bool CalcStateS<StateS* state>() {
+bool CalcStateS<StateS* state>() {
 //_0: // Начало диаграммы
   if(str[i] == '(') {
     i++;
@@ -62,7 +62,7 @@ _Bool CalcStateS<StateS* state>() {
             // что это ошибка, лучше определить снаружи
 };
 
-_Bool CalcStateS<StateS.S1* state>() {
+bool CalcStateS<StateS.S1* state>() {
 // _1: // Точка 1 диаграммы
   if(str[i] == ')') {
     i++;
@@ -80,7 +80,7 @@ _Bool CalcStateS<StateS.S1* state>() {
   return 0;
 }
 
-_Bool CalcStateS<StateS.S2* state>() {
+bool CalcStateS<StateS.S2* state>() {
 // _2: // Точка 2 диаграммы
   if(str[i] == ')') {
     i++;
@@ -93,7 +93,7 @@ _Bool CalcStateS<StateS.S2* state>() {
   return 0;
 }
 
-_Bool CalcStateS<StateS.S3* state>() {
+bool CalcStateS<StateS.S3* state>() {
 // _3: // Точка 3 диаграммы
   if(str[i] == '(') {
     i++;
@@ -104,17 +104,17 @@ _Bool CalcStateS<StateS.S3* state>() {
   return 0;
 }
 
-_Bool CalcStateS<StateS.False* state>() {
+bool CalcStateS<StateS.False* state>() {
   return 0;
 }
 
-_Bool CalcStateS<StateS.True* state>() {
+bool CalcStateS<StateS.True* state>() {
   return 1;
 }
 
 //------------------------------------------------------------------------------
 // Автомат, реализующий распознавание нетерминала S.
-_Bool S() {
+bool S() {
   struct StateS state;
   while(CalcStateS<&state>());
   return CalcStateS<&state>();
@@ -132,7 +132,7 @@ typedef struct StateZ{} case {void S1, True, False;} StateZ;
 //------------------------------------------------------------------------------
 // Обобщенная функция и обработчики, реализующие состояния автомата Z
 
-_Bool CalcStateZ<StateZ* state>() {
+bool CalcStateZ<StateZ* state>() {
 //_0: // Начало диаграммы
   if(S()) {
     init_spec(StateZ.S1, state);
@@ -143,7 +143,7 @@ _Bool CalcStateZ<StateZ* state>() {
             // что это ошибка, лучше определить снаружи
 };
 
-_Bool CalcStateZ<StateZ.S1* state>() {
+bool CalcStateZ<StateZ.S1* state>() {
 // _1: // Точка 1 диаграммы
     // За последней скобкой должен быть "конец строки"
   if(str[i] == '\n') {
@@ -156,17 +156,17 @@ _Bool CalcStateZ<StateZ.S1* state>() {
   return 0;
 }
 
-_Bool CalcStateZ<StateZ.False* state>() {
+bool CalcStateZ<StateZ.False* state>() {
   return 0;
 }
 
-_Bool CalcStateZ<StateZ.True* state>() {
+bool CalcStateZ<StateZ.True* state>() {
   return 1;
 }
 
 //------------------------------------------------------------------------------
 // Автомат, реализующий распознавание нетерминала Z.
-_Bool Z() {
+bool Z() {
   struct StateZ state;
   while(CalcStateZ<&state>());
   return CalcStateZ<&state>();
@@ -174,7 +174,7 @@ _Bool Z() {
 
 // Функция запускающая разбор и определяющая корректность его завершения,
 // если первый символ не принадлежит цепочки
-_Bool Parser() {
+bool Parser() {
   // Начальная инициализация.
   erFlag = 0;
   i = 0;

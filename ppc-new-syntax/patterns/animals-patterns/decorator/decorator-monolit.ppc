@@ -26,26 +26,14 @@ void GetInfo<Animal.dog* a>() {
 //------------------------------------------------------------------------------
 
 // Декоратор, добавляющий возраст
-// typedef struct AgeDecorator {int age;}< animal: Animal;> AgeDecorator;
-
-//!!! Не реализован вариант, когда специализации описываются в самом обобщении.!!!
-// typedef struct AgeDecorator {int age;} case{Animal animal;} AgeDecorator;
-
 typedef struct AgeDecorator {int age;} case{} AgeDecorator;
 AgeDecorator + {Animal animal;};
 
 void InitAgeDecorator(AgeDecorator* a, int age) {
   a->age = age;
 }
-// void GetAgeDecoratorInfo<AgeDecorator* d>() = 0;
-// void GetAgeDecoratorInfo<AgeDecorator.animal* d>() {
-//   // Перенаправление дальше на животного
-//   GetInfo<&(d->animal)>();
-//   printf(", I am %d yeas old.", d->age);
-// }
-
 Animal + {AgeDecorator ageDecorator;};
-// Animal + {AgeDecorator ageDecorator;};
+
 void GetInfo<Animal.ageDecorator* a>() {
   // Перенаправление дальше на животного
   AgeDecorator.animal* d = (struct AgeDecorator.animal*)&(a->ageDecorator);
@@ -54,9 +42,6 @@ void GetInfo<Animal.ageDecorator* a>() {
 }
 
 // Декоратор, добавляющий имя
-//!!! Не реализован вариант, когда специализации описываются в самом обобщении.!!!
-// typedef struct NameDecorator {char* name;} case{Animal animal;} NameDecorator;
-
 typedef struct NameDecorator {char* name;} case{} NameDecorator;
 NameDecorator + {Animal animal;};
 
@@ -72,6 +57,7 @@ void GetInfo<Animal.nameDecorator* a>() {
   GetInfo<(Animal*)&(d->animal)>();
 }
 
+//------------------------------------------------------------------------------
 // Клиент запускает сформированных животных
 void ClientCode(Animal* a) {
   printf("\n");
@@ -79,10 +65,11 @@ void ClientCode(Animal* a) {
   printf("\n");
 }
 
+//------------------------------------------------------------------------------
 int main() {
   printf("Different Animals:\n");
-  struct Animal.duck duck;
-  struct Animal.dog  dog;
+  Animal.duck duck;
+  Animal.dog  dog;
 
   ClientCode(&duck);
   ClientCode(&dog);

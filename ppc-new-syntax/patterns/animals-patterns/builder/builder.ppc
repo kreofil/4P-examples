@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+//------------------------------------------------------------------------------
 // В процедурно-параметрической реализации все вспомогательные данные -
 // просто структуры. Для упрощения вектор строк заменен двумерным массивом
 typedef struct Animals {
@@ -22,12 +23,10 @@ void ListParts(Animals* a) {
   printf("\n\n");
 }
 
-// Добавление животного в список
-
+//------------------------------------------------------------------------------
 // Интерфейс Строителя объявляет функции для создания описаний
 // купленных животных.
-// typedef struct Builder{}<> Builder;
-typedef struct Builder{} case{} Builder;
+typedef struct Builder{} case {} Builder;
 void BuyDuck<Builder* b>() = 0;
 void BuyDog<Builder* b>()  = 0;
 
@@ -68,8 +67,8 @@ Animals* GetDomesticResult(DomesticFarmBuilder* b) {
   return result;
 }
 
+//------------------------------------------------------------------------------
 typedef struct ToyFarmBuilder {Animals* animals;} ToyFarmBuilder;
-// Builder + <ToyFarmBuilder;>;
 Builder + {ToyFarmBuilder toyFarmBuilder;};
 
 // Все этапы производства работают с одним и тем же экземпляром продукта.
@@ -128,12 +127,10 @@ void BuildFullFeaturedProduct(Director* d){
   BuyDog<d->builder>();
 }
 
+//------------------------------------------------------------------------------
 // Клиентский код создаёт объект-строитель, передаёт его директору, а затем
 // инициирует процесс построения. Конечный результат извлекается из объекта-
 // строителя.
-
-// I used raw pointers for simplicity however you may prefer to use smart
-// pointers here
 void ClientCode(Director* director) {
     struct Builder.domesticFarmBuilder* domesticBuilder
                                 = create_spec(Builder.domesticFarmBuilder);
@@ -196,6 +193,7 @@ void ClientCode(Director* director) {
     free(toyBuilder);
 }
 
+//------------------------------------------------------------------------------
 int main(){
     Director* director= malloc(sizeof(Director));
     ClientCode(director);
