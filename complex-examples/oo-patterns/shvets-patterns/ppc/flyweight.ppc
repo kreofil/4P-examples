@@ -1,0 +1,269 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+
+// Паттерн Легковес
+// Назначение: Позволяет вместить бóльшее количество объектов в отведённую
+// оперативную память. Легковес экономит память, разделяя общее состояние
+// объектов между собой, вместо хранения одинаковых данных в каждом объекте.
+
+//------------------------------------------------------------------------------
+// Список данных для задания одного общего состояния строками констант
+typedef struct SharedStateString {
+  char* brand;
+  char* model;
+  char* color;
+} SharedStateString;
+// Возвращает хеш строки Легковеса для данной строки.
+char* GetKeyForPtrString(SharedStateString *ss, char* keyValue) {
+  strcpy(keyValue, ss->brand);
+  strcat(keyValue, "_");
+  strcat(keyValue, ss->model);
+  strcat(keyValue, "_");
+  strcat(keyValue, ss->color);
+  return keyValue;
+}
+
+//------------------------------------------------------------------------------
+// Общее состояние для всех объектов
+typedef struct SharedState {
+  char brand[256];
+  char model[256];
+  char color[256];
+} SharedState;
+// Вывод общего состояния
+void SharedStateOut(SharedState* ss) {
+  printf("[ %s , %s, %s ]", ss->brand, ss->model, ss->color);
+}
+// Инициализация общего состояния, сохраняющего данные по модели
+void SharedStateInit(SharedState* s, char* brand, char* model, char* color) {
+  strcpy(s->brand, brand);
+  strcpy(s->model, model);
+  strcpy(s->color, color);
+  // SharedStateOut(s);
+}
+// Возвращает хеш строки Легковеса для данного состояния.
+char* GetKey(SharedState *ss, char* keyValue) {
+  strcpy(keyValue, ss->brand);
+  strcat(keyValue, "_");
+  strcat(keyValue, ss->model);
+  strcat(keyValue, "_");
+  strcat(keyValue, ss->color);
+  return keyValue;
+}
+
+//------------------------------------------------------------------------------
+// Уникальное состояние
+typedef struct UniqueState {
+  char owner[256];
+  char plates[256];
+} UniqueState;
+// Инициализация уникального состояния
+void UniqueStateInit(UniqueState* s, char* owner, char* plates) {
+  strcpy(s->owner, owner);
+  strcpy(s->plates, plates);
+}
+// Вывод уникального состояния
+void UniqueStateOut(UniqueState* us) {
+  printf("[ %s , %s ]", us->owner, us->plates);
+}
+
+//------------------------------------------------------------------------------
+// Легковес хранит общую часть состояния (также называемую внутренним
+// состоянием), которая принадлежит нескольким реальным бизнес-объектам.
+// Легковес принимает оставшуюся часть состояния (внешнее состояние, уникальное
+// для каждого объекта)  через его параметры метода.
+typedef struct Flyweight {
+  SharedState *sharedState;
+} Flyweight;
+// Инициализация легковеса с формированием общего состояния
+// void FlyweightInitSharedState(Flyweight* f, SharedState *sharedState) {
+void FlyweightInitSharedState(Flyweight* f, SharedStateString *sharedState) {
+  f->sharedState = malloc(sizeof(SharedState));
+  SharedStateInit(f->sharedState,
+                  sharedState->brand, sharedState->model, sharedState->color);
+}
+// Инициализация лекговеса копией другого легковеса (зачем)
+void FlyweightInitFlyweight(Flyweight* f, Flyweight* other) {
+  f->sharedState = malloc(sizeof(SharedState));
+  SharedStateInit(f->sharedState, other->sharedState->brand,
+                  other->sharedState->model, other->sharedState->color);
+}
+// Очистка состояния легковеса от общего состояния
+void FlyweightClear(Flyweight* f) {
+  free(f->sharedState);
+  f->sharedState = NULL;
+}
+// Получение указателя на состояние, хранимого в легковесе
+SharedState *SharedStateGet(Flyweight* f) {
+  return f->sharedState;
+}
+// Операция, собирающее воедино общее состояние из легковеса
+// и уникальное состояние
+void Operation(Flyweight* f, UniqueState* uniqueState) {
+  printf("Flyweight: Displaying shared (");
+  SharedStateOut(f->sharedState);
+  printf(") and unique (");
+  UniqueStateOut(uniqueState);
+  printf(") state.\n");
+}
+
+//------------------------------------------------------------------------------
+// Простейшая имитация пары неупорядоченного мэпа. Только для демонстрации.
+// Используется для доступа легковесу и его поиска по ключу
+typedef struct MapPair {
+  char key[256];
+  Flyweight flyweight;
+} MapPair;
+// Мэп при этом состоит из пар, образующих массив легковесов
+// Реализована упрощенная версия с фиксированным массивом без проверки
+typedef struct Map {
+  int size;                       // Число легковесов
+  MapPair flyweightsArray[20];    // Массив легковесов
+} Map;
+
+// Начальная инициализация Map
+void MapInit(Map* m) {
+  m->size = 0;
+}
+
+// Очистка Map. Достаточно обнулить размер.
+void MapClear(Map* m) {m->size = 0;}
+
+// Поиск местоположения легковеса в Map по ключу
+// возращается индекс от 0 и до size-1 или -1 при отсутствии значения
+int MapFind(Map* m, char* key) {
+  for(int i = 0; i < m->size; ++i) {
+    if(!strcmp(m->flyweightsArray[i].key, key)) {
+      return i;
+    }
+  }
+  return -1;
+}
+// Добавление уникального легковеса в Map. Должно осуществляеться в конец,
+// определяемый текущим размером.
+void MapAppend(Map* m, char* key, SharedState* sharedState) {
+  m->flyweightsArray[m->size].flyweight.sharedState = malloc(sizeof(SharedState));
+  strcpy(m->flyweightsArray[m->size].key, key);
+  strcpy(m->flyweightsArray[m->size].flyweight.sharedState->brand, sharedState->brand);
+  strcpy(m->flyweightsArray[m->size].flyweight.sharedState->model, sharedState->model);
+  strcpy(m->flyweightsArray[m->size].flyweight.sharedState->color, sharedState->color);
+  (m->size)++;
+}
+
+//------------------------------------------------------------------------------
+// Фабрика Легковесов создает объекты-Легковесы и управляет ими. Она
+// обеспечивает правильное разделение легковесов. Когда клиент запрашивает
+// легковес, фабрика либо возвращает существующий экземпляр, либо создает новый,
+// если он ещё не существует.
+typedef struct FlyweightFactory {
+  Map store;          // Хранилище легковесов
+} FlyweightFactory ;
+
+void FlyweightFactoryInit(FlyweightFactory* f) {
+  MapInit(&(f->store));
+}
+// Загрузка легковесов в фабрику из предварительно заданного списка данных
+void FlyweightFactoryLoad(FlyweightFactory* ff,
+                          SharedStateString* sharedStatesList,
+                          int sharedStatesSize) {
+  char keyValue[256]; // Хранение текущего ключа
+  // Обход и загрузка легковесов
+  for (int i = 0; i < sharedStatesSize; ++i) {
+    // printf("%d: ", i);
+    GetKeyForPtrString(&sharedStatesList[i], keyValue);
+    // printf("%s\n", keyValue);
+    Map* map = &(ff->store);
+    strcpy(map->flyweightsArray[i].key, keyValue);
+    // printf("%s\n", map->flyweightsArray[i].key);
+    ff->store.flyweightsArray[i].flyweight.sharedState = malloc(sizeof(SharedState));
+    FlyweightInitSharedState(&(ff->store.flyweightsArray[i].flyweight),
+                             &(sharedStatesList[i]));
+    (ff->store.size)++;
+  }
+}
+
+// Возвращает существующий Легковес с заданным состоянием или создает новый.
+Flyweight* GetFlyweight(FlyweightFactory* ff, SharedState *sharedState) {
+  // printf("SharedState = ");
+  // SharedStateOut(sharedState);
+  char key[256];
+    GetKey(sharedState, key);
+    Map* m = &(ff->store);
+    int index = MapFind(m, key);
+    if (index == -1) {
+      printf("FlyweightFactory: Can't find a flyweight, creating new one.\n");
+      // Добавление нового общего состояния в Map
+      MapAppend(m, key, sharedState);
+      // Возращается указатель на последний добавленный лекговес
+      return &(ff->store.flyweightsArray[m->size - 1].flyweight);
+    }
+    else {
+      printf("FlyweightFactory: Reusing existing flyweight.\n");
+      return &(ff->store.flyweightsArray[index].flyweight);
+    }
+}
+
+void ListFlyweights(FlyweightFactory* ff) {
+    size_t count = ff->store.size;
+    printf("\nFlyweightFactory: I have %d flyweights:\n", ff->store.size);
+    for (int i = 0; i < ff->store.size; ++i) {
+      printf("%s\n", ff->store.flyweightsArray[i].key);
+    }
+}
+
+// ...
+void AddCarToPoliceDatabase(FlyweightFactory* ff,
+                            char* plates, char* owner,
+                            char* brand, char* model, char* color) {
+    printf("\nClient: Adding a car to database.\n");
+    SharedState ss;
+    SharedStateInit(&ss, brand, model, color);
+    Flyweight* flyweight = GetFlyweight(ff, &ss);
+    // Клиентский код либо сохраняет, либо вычисляет внешнее состояние и
+    // передает его методам легковеса.
+    UniqueState uniqueState;
+    UniqueStateInit(&uniqueState, owner, plates);
+    Operation(flyweight, &uniqueState);
+}
+
+// Клиентский код обычно создает кучу предварительно заполненных легковесов на
+// этапе инициализации приложения.
+int main() {
+  SharedStateString sharedStateList[] = {
+    {"Chevrolet", "Camaro2018", "pink"},
+    {"Mercedes Benz", "C300", "black"},
+    {"Mercedes Benz", "C500", "red"},
+    {"BMW", "M5", "red"},
+    {"BMW", "X6", "white"}
+  };
+  int sharedStateListSize = sizeof(sharedStateList)/sizeof(SharedStateString);
+  // printf("sharedStateListSize = %d\n", sharedStateListSize);
+
+  FlyweightFactory factory;
+  FlyweightFactoryInit(&factory);
+
+  FlyweightFactoryLoad(&factory, sharedStateList, sharedStateListSize);
+
+  ListFlyweights(&factory);
+
+  AddCarToPoliceDatabase(&factory,
+                         "CL234IR",
+                         "James Doe",
+                         "BMW",
+                         "M5",
+                         "red");
+
+  // ListFlyweights(&factory);
+
+  AddCarToPoliceDatabase(&factory,
+                         "CL234IR",
+                         "James Doe",
+                         "BMW",
+                         "X1",
+                         "red");
+  ListFlyweights(&factory);
+
+  return 0;
+}
