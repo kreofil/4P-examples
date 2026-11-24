@@ -33,13 +33,11 @@ void BuyDog<Builder* b>()  = 0;
 // Программа может иметь несколько вариантов Строителей,
 // реализованных по-разному.
 typedef struct DomesticFarmBuilder {Animals* animals;} DomesticFarmBuilder;
-// Builder + <DomesticFarmBuilder;>;
 Builder + {DomesticFarmBuilder domesticFarmBuilder;};
 
 // Все этапы производства работают с одним и тем же экземпляром продукта.
 void BuyDuck<Builder.domesticFarmBuilder* b>() {
   Animals* a = b->domesticFarmBuilder.animals;
-  // Animals* a = b->domesticFarmBuilder.animals;
   strcpy(a->animalsList[a->animal_size++], "We have bought the Domestic Duck");
 }
 void BuyDog<Builder.domesticFarmBuilder* b>() {

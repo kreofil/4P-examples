@@ -82,10 +82,10 @@ int main() {
   Animal.dog dog;   Init<&dog>();
   Visitor.feed feeding;
   Visitor.swim swimming;
-  Client(&duck, (Visitor*)&feeding);
-  Client(&dog, (Visitor*)&feeding);
-  Client(&duck, (Visitor*)&swimming);
-  Client(&dog, (Visitor*)&swimming);
+  Client(&duck, &feeding);
+  Client(&dog, &feeding);
+  Client(&duck, &swimming);
+  Client(&dog, &swimming);
 
   return 0;
 }

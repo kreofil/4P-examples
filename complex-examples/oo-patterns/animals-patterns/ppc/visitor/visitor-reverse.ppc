@@ -39,6 +39,7 @@ typedef struct Visitor {} enum {} Visitor;
 Visitor + {feed};
 Visitor + {swim};
 
+//------------------------------------------------------------------------------
 // Обобщающие функции Посетителя
 // Посещение еды
 void VisitFeed<Animal* a>() = 0;

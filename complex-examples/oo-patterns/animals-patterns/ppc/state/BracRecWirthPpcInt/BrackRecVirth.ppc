@@ -35,12 +35,7 @@ void GetOneLine(FILE *is, char* str) {
 
 //------------------------------------------------------------------------------
 // Обобщение, определяющее состояния автомата S
-// typedef struct StateS{}<Start, S1, S2, S3: void;>StateS;
-
-//!!!! Это не работает!!! Но нужно.
-// typedef struct StateS{} case{void Start, S1, S2, S3;} StateS;
-
-typedef struct StateS{} case{} StateS;
+typedef struct StateS{} enum {} StateS;
 StateS + {Start, S1, S2, S3};
 
 //------------------------------------------------------------------------------

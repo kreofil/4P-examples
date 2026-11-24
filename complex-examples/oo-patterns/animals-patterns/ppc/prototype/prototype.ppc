@@ -32,10 +32,17 @@ Animal* Clone<Animal.duck* a>() {
 // Клонирование утки с использованием копирования памяти
 Animal* MemClone<Animal.duck* a>() {
   printf("The memory clone of duck: ");
-  // unsigned long size = sizeof(*a);
-  unsigned long size = sizeof(struct Animal.duck); // нужно писать пока struct
+  unsigned long size = sizeof(Animal.duck);
   Animal* clone = malloc(size);
   memcpy(clone, a, size);
+  GetInfo<clone>();
+  return clone;
+}
+// Клонирование утки с передачей данных по значению
+Animal* Assign<Animal.duck* a>() {
+  printf("The clone of duck: ");
+  Animal.duck* clone = create_spec(Animal.duck);
+  *clone = *a;
   GetInfo<clone>();
   return clone;
 }
@@ -57,10 +64,17 @@ Animal* Clone<Animal.dog* a>() {
 // Клонирование собаки с использованием копирования памяти
 Animal* MemClone<Animal.dog* a>() {
   printf("The clone of dog: ");
-  // unsigned long size = sizeof(*a);
-  unsigned long size = sizeof(struct Animal.dog); // нужно писать пока struct
-  Animal* clone = malloc(size);
+  unsigned long size = sizeof(Animal.dog);
+  Animal.dog* clone = malloc(size);
   memcpy(clone, a, size);
+  GetInfo<clone>();
+  return clone;
+}
+// Клонирование собаки с передачей данных по значению
+Animal* Assign<Animal.dog* a>() {
+  printf("The clone of dog: ");
+  Animal.dog* clone = malloc(sizeof(Animal.dog));
+  *clone = *a;
   GetInfo<clone>();
   return clone;
 }
@@ -97,6 +111,22 @@ void Client() {
   GetInfo<&dog2>();
   printf("\nLet's create a Clone of the next Dog using MemClone function\n");
   dogClone = MemClone<&dog2>();
+  free(dogClone);
+
+  printf("\nLet's create a next Duck\n");
+  Animal.duck duck3;
+  Init(&duck3, "Scrooge Mc'Duck");
+  GetInfo<&duck3>();
+  printf("\nLet's create a Clone of the next Duck using Assign\n");
+  duckClone = Assign<&duck3>();
+  free(duckClone);
+
+  printf("\nLet's create a next Dog\n");
+  Animal.dog dog3;
+  Init(&dog3, "Laika");
+  GetInfo<&dog3>();
+  printf("\nLet's create a Clone of the next Dog using Assign\n");
+  dogClone = Assign<&dog3>();
   free(dogClone);
 }
 
